@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Plan de Transformación Logística — Línea de tiempo 2026-2030</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root{--az:#16336F;--oro:#F5B400;--tx:#15171C;--g2:#7A8094;--bg:#F4F5F7;--br:#E3E6EC;--ver:#0F6E56;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Calibri,'Segoe UI',system-ui,sans-serif;color:var(--tx);height:100vh;display:flex;flex-direction:column;overflow:hidden;background:#fff}
+header{background:var(--az);color:#fff;padding:10px 18px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+header .brand{border-left:4px solid var(--oro);padding-left:12px}
+header h1{font-size:17px;font-weight:700;letter-spacing:.3px}
+header .sub{font-size:11px;color:#C9D2E4}
+.controls{display:flex;align-items:center;gap:10px;margin-left:auto}
+button{cursor:pointer;border:none;border-radius:6px;font-family:inherit}
+#play{background:var(--oro);color:var(--az);font-weight:700;font-size:15px;padding:8px 22px}
+#play:hover{filter:brightness(1.06)}
+.spd{background:rgba(255,255,255,.14);color:#fff;font-size:12px;padding:6px 10px}
+.spd.on{background:#fff;color:var(--az);font-weight:700}
+#reset{background:rgba(255,255,255,.14);color:#fff;font-size:12px;padding:6px 10px}
+#qlabel{font-size:26px;font-weight:700;color:var(--oro);min-width:118px;text-align:center}
+#bar{flex:1 1 100%;height:26px;position:relative;background:rgba(255,255,255,.13);border-radius:6px;cursor:pointer;overflow:hidden}
+#fill{position:absolute;left:0;top:0;bottom:0;background:var(--oro);width:0;border-radius:6px 0 0 6px;opacity:.85}
+#ticks{position:absolute;inset:0;display:flex}
+#ticks div{flex:1;border-right:1px solid rgba(255,255,255,.25);font-size:9.5px;color:#dfe6f3;display:flex;align-items:center;justify-content:center;pointer-events:none}
+main{flex:1;display:flex;min-height:0}
+#map{flex:1}
+aside{width:392px;display:flex;flex-direction:column;border-left:1px solid var(--br);background:#fff}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px}
+.kpi{background:var(--bg);border:1px solid var(--br);border-radius:8px;padding:9px 12px}
+.kpi b{display:block;font-size:21px;color:var(--az)}
+.kpi span{font-size:10.5px;color:var(--g2)}
+#feedwrap{flex:1;overflow-y:auto;padding:0 12px 12px}
+#feedwrap h3{font-size:11px;color:var(--g2);text-transform:uppercase;letter-spacing:1px;margin:4px 0 8px;position:sticky;top:0;background:#fff;padding:6px 0}
+.hito{border-left:3px solid var(--br);padding:6px 10px;margin-bottom:8px;background:#fff;border-radius:0 6px 6px 0;font-size:12.5px;animation:pop .4s}
+.hito .q{font-size:10px;color:var(--g2);font-weight:700}
+.hito.op{border-left-color:var(--ver);background:#f2faf7}
+.hito.adq{border-left-color:var(--oro);background:#fdf8ea}
+.hito.cl{border-left-color:var(--az);background:#eef2f9}
+.hito.final{border-left-color:var(--oro);background:var(--az);color:#fff}
+.hito.final .q{color:var(--oro)}
+@keyframes pop{from{transform:translateX(14px);opacity:0}to{transform:none;opacity:1}}
+footer{background:var(--bg);border-top:1px solid var(--br);padding:5px 16px;font-size:10.5px;color:var(--g2);display:flex;gap:16px;flex-wrap:wrap}
+.lg{display:flex;align-items:center;gap:5px}
+.dot{width:11px;height:11px;border-radius:50%;display:inline-block}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(245,180,0,.7)}70%{box-shadow:0 0 0 11px rgba(245,180,0,0)}100%{box-shadow:0 0 0 0 rgba(245,180,0,0)}}
+.mk{border-radius:50%;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.35)}
+.mk.build{animation:pulse 1.4s infinite}
+.mklabel{background:var(--az);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;white-space:nowrap;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.mklabel.gold{background:var(--oro);color:var(--az)}
+#endcard{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(22,51,111,.88);z-index:1000;text-align:center;color:#fff}
+#endcard h2{font-size:42px}#endcard .o{color:var(--oro)}#endcard p{margin-top:10px;font-size:16px;color:#C9D2E4}
+#endcard button{margin-top:22px;background:var(--oro);color:var(--az);font-weight:700;font-size:15px;padding:10px 26px}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><h1>PLAN DE TRANSFORMACIÓN LOGÍSTICA</h1><div class="sub">De 80 a 500 M€ · Evolución de la red 2026-2030 · Confidencial — uso interno</div></div>
+  <div class="controls">
+    <div id="qlabel">2S 2026</div>
+    <button id="play">▶ Reproducir</button>
+    <button class="spd on" data-s="1">×1</button><button class="spd" data-s="2">×2</button><button class="spd" data-s="4">×4</button>
+    <button id="reset">Reiniciar</button>
+  </div>
+  <div id="bar"><div id="fill"></div><div id="ticks"></div></div>
+</header>
+<main>
+  <div id="map"></div>
+  <aside>
+    <div class="kpis">
+      <div class="kpi"><b id="kfact">130 M€</b><span>Facturación de la red (con intercompany)</span></div>
+      <div class="kpi"><b id="knodos">17</b><span>Nodos operativos</span></div>
+      <div class="kpi"><b id="kinv">0,0 M€</b><span>Inversión logística acumulada (punto medio)</span></div>
+      <div class="kpi"><b id="kadq">0 / 9</b><span>Adquisiciones cerradas (≈70 % de su facturación)</span></div>
+    </div>
+    <div id="feedwrap"><h3>Hitos</h3><div id="feed"></div></div>
+  </aside>
+</main>
+<footer>
+  <span class="lg"><span class="dot" style="background:#9aa2ad"></span>Red actual</span>
+  <span class="lg"><span class="dot" style="background:#F5B400;border:2px solid #b98800;box-sizing:border-box"></span>En ejecución</span>
+  <span class="lg"><span class="dot" style="background:#16336F"></span>Hub operativo</span>
+  <span class="lg"><span class="dot" style="background:#0F6E56"></span>Centro Logístico</span>
+  <span class="lg"><span class="dot" style="background:#d9a800;width:7px;height:7px"></span>Centro de reparto</span>
+  <span style="margin-left:auto">Los hubs de fuera de Madrid se identifican por número · importes = punto medio de la horquilla del plan</span>
+</footer>
+<div id="endcard"><div><h2>UNA RED <span class="o">PARA 500 M€</span></h2><p>1 Centro Logístico · 13 hubs · 121 centros de reparto<br>Programa completo ≈ 370-431 M€: adquisiciones ≈237 + plataforma logística 133-194</p><button onclick="resetAll()">Volver a ver</button></div></div>
+
+<script>
+/* ================== MAPA ================== */
+const map=L.map('map',{zoomControl:false,attributionControl:false}).setView([40.42,-3.65],9.2);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:18}).addTo(map);
+L.control.zoom({position:'bottomleft'}).addTo(map);
+
+function icon(color,size,build,ring){return L.divIcon({className:'',html:`<div class="mk${build?' build':''}" style="width:${size}px;height:${size}px;background:${color};${ring?'border:2.5px solid '+ring+';':''}"></div>`,iconSize:[size,size],iconAnchor:[size/2,size/2]});}
+function label(txt,gold){return L.divIcon({className:'',html:`<div class="mklabel${gold?' gold':''}">${txt}</div>`,iconSize:null,iconAnchor:[-9,9]});}
+
+const AZ='#16336F',ORO='#F5B400',VER='#0F6E56',GR='#9aa2ad',CRC='#d9a800';
+
+/* Red actual (17 puntos, gris) */
+const actual=[["Chiloeches (CL actual)",40.667,-3.156],["Alcalá",40.4819,-3.3635],["San Fernando",40.423,-3.532],["Móstoles",40.322,-3.865],
+["Villaverde",40.345,-3.696],["Guadalajara",40.629,-3.166],["Villalba",40.630,-4.005],["Las Rozas",40.492,-3.874],["Valdemoro",40.190,-3.679],
+["Parla",40.237,-3.767],["Fuenlabrada",40.284,-3.794],["Alcorcón",40.346,-3.827],["Arganda",40.301,-3.437],["Vallecas",40.379,-3.621],
+["Tres Cantos",40.600,-3.708],["Alcobendas",40.541,-3.635],["Boadilla",40.405,-3.876],["Coslada",40.423,-3.561],["Alovera (tránsito)",40.596,-3.247]];
+const actualMk=actual.map(a=>L.marker([a[1],a[2]],{icon:icon(GR,9)}).addTo(map).bindTooltip(a[0]));
+
+/* Nodos futuros */
+const CL={lat:40.27,lon:-3.70,mk:null,lb:null};
+const hubsM=[["Hub Alcalá",40.4819,-3.3635],["Hub Oeste",40.322,-3.865],["Hub Sur",40.30,-3.72],["Hub Este",40.423,-3.545],["Hub Norte",40.541,-3.635]];
+const hubsR=[["Hub regional 1 · Andalucía occ.",37.39,-5.99],["Hub regional 2 · Cataluña",41.39,2.16],["Hub regional 3 · Levante",39.47,-0.38],
+["Hub regional 4 · Andalucía or.",36.72,-4.42],["Hub regional 5 · Valle del Ebro",41.65,-0.88],["Hub regional 6 · Norte-Cantábrico",43.26,-2.93],
+["Hub regional 7 · Galicia",42.88,-8.54],["Hub regional 8 · Duero",41.65,-4.72]];
+const H={}; // marcadores por nombre
+
+/* CR: nubes deterministas alrededor de cada territorio */
+function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const rnd=mulberry(2030);
+function cloud(lat,lon,n,r){const out=[];for(let i=0;i<n;i++){const an=rnd()*6.283,rr=(0.25+rnd()*0.75)*r;out.push([lat+Math.sin(an)*rr,lon+Math.cos(an)*rr*1.25]);}return out;}
+const crPools={ madrid:cloud(40.40,-3.70,12,0.28),
+ r1:cloud(37.6,-5.6,19,1.5), r2:cloud(41.6,1.6,12,1.1), r3:cloud(39.0,-0.6,29,1.5), r4:cloud(36.95,-4.3,12,1.0),
+ r5:cloud(41.9,-1.1,4,1.0), r6:cloud(43.2,-3.6,11,1.3), r7:cloud(42.7,-8.1,9,1.0), r8:cloud(41.7,-4.6,4,1.2), clm:cloud(39.4,-3.4,9,1.3)};
+let crShown=0; const crQueue=[...crPools.madrid,...crPools.r1,...crPools.r2,...crPools.r3,...crPools.clm,...crPools.r4,...crPools.r5,...crPools.r6,...crPools.r7,...crPools.r8];
+function showCR(n){while(crShown<n&&crShown<crQueue.length){const c=crQueue[crShown++];L.circleMarker([c[0],c[1]],{radius:3.4,color:'#fff',weight:1,fillColor:CRC,fillOpacity:.95}).addTo(map);}}
+
+function setHub(name,lat,lon,state,gold){ // state: build|op
+ if(H[name]){map.removeLayer(H[name].m);map.removeLayer(H[name].l);}
+ const m=L.marker([lat,lon],{icon:icon(state==='build'?ORO:AZ,state==='build'?15:17,state==='build'),zIndexOffset:500}).addTo(map).bindTooltip(name);
+ const l=L.marker([lat,lon],{icon:label(name.split(' · ')[0],gold),zIndexOffset:600}).addTo(map);
+ H[name]={m,l};}
+function setCL(state){ // busca|obra|op
+ if(CL.mk){map.removeLayer(CL.mk);} if(CL.lb){map.removeLayer(CL.lb);}
+ const col=state==='op'?VER:ORO;
+ CL.mk=L.marker([CL.lat,CL.lon],{icon:icon(col,state==='op'?22:16,state!=='op'),zIndexOffset:900}).addTo(map).bindTooltip('Centro Logístico · 22.000 m²');
+ CL.lb=L.marker([CL.lat,CL.lon],{icon:label(state==='op'?'CENTRO LOGÍSTICO':(state==='obra'?'CL · en obra':'CL · búsqueda de parcela'),state==='op'),zIndexOffset:901}).addTo(map);}
+
+/* ================== GUION ================== */
+/* 18 trimestres: 0=2S26a(3T26) ... usamos 2S-26 como dos pasos (3T,4T) */
+const QS=['3T 2026','4T 2026','1T 2027','2T 2027','3T 2027','4T 2027','1T 2028','2T 2028','3T 2028','4T 2028','1T 2029','2T 2029','3T 2029','4T 2029','1T 2030','2T 2030','3T 2030','4T 2030'];
+/* interpolables por trimestre: [fact, nodos, invAcum, adq, crAcum] */
+const K=[[130,17,0.2,0,0],[130,17,0.5,0,0],[130,17,6,0,0],[130,17,14,0,0],[220,17,25,1,4],[260,18,37,2,15],
+[260,18,52,2,20],[300,19,68,3,26],[322,20,84,5,32],[364,21,104,6,50],[364,23,116,6,62],[389,24,127,7,72],
+[389,27,138,7,82],[409,28,150,8,90],[469,30,155,9,100],[480,31,159,9,108],[495,33,163,9,121],[500,135,164,9,121]];
+/* eventos al ENTRAR en cada trimestre */
+const EV={
+0:[{t:'Arranca el programa: RFP de automatización a cinco proveedores, mandato de búsqueda de la parcela del CL y de las primeras naves de hub.',c:''},
+   {t:'La red actual: 17 puntos, 2.644 talleres, entrega media de 56 minutos.',c:''},
+   {f:()=>{setCL('busca');}}],
+1:[{t:'OK del piloto: pedido del sistema automático del Hub Alcalá (13-15.000 cubetas). La instalación se hará con el almacén en marcha.',c:'cl'},
+   {f:()=>{setHub('Hub Alcalá',40.4819,-3.3635,'build');}}],
+2:[{t:'Compra del Hub Oeste en due diligence. Parcela del CL: negociación en el radio de 30 km.',c:''},
+   {f:()=>{setHub('Hub Oeste',40.322,-3.865,'build');}}],
+3:[{t:'Escritura de la parcela del CL. Proyecto y licencia en marcha.',c:'cl'},
+   {t:'Primera adquisición firmada: Andalucía occidental, 90 M€ de facturación (coste ≈63 M€, al 70 %). Arranca la búsqueda de la nave del Hub regional 1.',c:'adq'},
+   {f:()=>{map.flyTo([40.2,-4.6],6.1,{duration:2.5});setHub('Hub Sur',40.30,-3.72,'build');setHub('Hub regional 1 · Andalucía occ.',37.39,-5.99,'build');}}],
+4:[{t:'Segunda adquisición: Cataluña, 40 M€ (coste ≈28 M€). Compra del Hub Sur en curso.',c:'adq'},
+   {f:()=>{setHub('Hub regional 2 · Cataluña',41.39,2.16,'build');}}],
+5:[{t:'HUB ALCALÁ OPERATIVO — primer nodo de la nueva red, con el servicio intacto durante la instalación.',c:'op'},
+   {t:'Licencia de obra del CL concedida. Quince centros de reparto abiertos con el nuevo modelo.',c:'cl'},
+   {f:()=>{setHub('Hub Alcalá',40.4819,-3.3635,'op');setCL('obra');}}],
+6:[{t:'Obra del CL iniciada: 22.000 m² con núcleo automático de 58.438 cubetas. Compra del Hub Este.',c:'cl'},
+   {f:()=>{setHub('Hub Este',40.423,-3.545,'build');}}],
+7:[{t:'HUB OESTE OPERATIVO. Tercera y cuarta adquisición: Levante (40 M€) y Valle del Ebro (22 M€).',c:'op'},
+   {f:()=>{setHub('Hub Oeste',40.322,-3.865,'op');setHub('Hub regional 3 · Levante',39.47,-0.38,'build');setHub('Hub regional 5 · Valle del Ebro',41.65,-0.88,'build');}}],
+8:[{t:'HUB SUR OPERATIVO — el más cargado de la red (633 talleres). Compra del Hub Norte. Adquisiciones: Andalucía oriental (18 M€) y Castilla-La Mancha (24 M€).',c:'op'},
+   {f:()=>{setHub('Hub Sur',40.30,-3.72,'op');setHub('Hub Norte',40.541,-3.635,'build');setHub('Hub regional 4 · Andalucía or.',36.72,-4.42,'build');}}],
+9:[{t:'HUB REGIONAL 1 OPERATIVO — primer territorio fuera de Madrid integrado, con sus 19 centros de reparto en apertura.',c:'op'},
+   {f:()=>{setHub('Hub regional 1 · Andalucía occ.',37.39,-5.99,'op',true);}}],
+10:[{t:'HUB ESTE y HUB REGIONAL 2 OPERATIVOS. El CL, a mitad de obra.',c:'op'},
+   {f:()=>{setHub('Hub Este',40.423,-3.545,'op');setHub('Hub regional 2 · Cataluña',41.39,2.16,'op',true);}}],
+11:[{t:'HUB REGIONAL 3 OPERATIVO (29 centros de reparto, el territorio más capilar). Adquisiciones: Norte-Cantábrico (25 M€) y Duero (20 M€).',c:'op'},
+   {f:()=>{setHub('Hub regional 3 · Levante',39.47,-0.38,'op',true);setHub('Hub regional 6 · Norte-Cantábrico',43.26,-2.93,'build');}}],
+12:[{t:'MADRID COMPLETO: HUB NORTE OPERATIVO — cinco hubs en servicio. También el HUB REGIONAL 4.',c:'op'},
+   {t:'El CL arranca: automatización instalada y migración por familias desde Chiloeches y Alovera.',c:'cl'},
+   {f:()=>{setHub('Hub Norte',40.541,-3.635,'op');setHub('Hub regional 4 · Andalucía or.',36.72,-4.42,'op',true);setCL('obra');}}],
+13:[{t:'HUB REGIONAL 5 OPERATIVO. Última adquisición firmada: Galicia (60 M€). Novena operación: 339 M€ de facturación incorporada, coste ≈237 M€.',c:'op'},
+   {f:()=>{setHub('Hub regional 5 · Valle del Ebro',41.65,-0.88,'op',true);setHub('Hub regional 7 · Galicia',42.88,-8.54,'build');setHub('Hub regional 8 · Duero',41.65,-4.72,'build');}}],
+14:[{t:'CENTRO LOGÍSTICO A PLENA CARGA — 22.000 m², las cinco familias y el catálogo completo. Chiloeches y Alovera salen de la red. HUB REGIONAL 6 OPERATIVO.',c:'op'},
+   {f:()=>{setCL('op');setHub('Hub regional 6 · Norte-Cantábrico',43.26,-2.93,'op',true);actualMk[0].setOpacity(.25);actualMk[18].setOpacity(.25);}}],
+15:[{t:'HUB REGIONAL 7 OPERATIVO.',c:'op'},{f:()=>{setHub('Hub regional 7 · Galicia',42.88,-8.54,'op',true);}}],
+16:[{t:'HUB REGIONAL 8 OPERATIVO — RED COMPLETA: 1 CL + 13 hubs + 121 centros de reparto = 135 nodos.',c:'op'},
+   {f:()=>{setHub('Hub regional 8 · Duero',41.65,-4.72,'op',true);}}],
+17:[{t:'500 M€ sobre una red diseñada para ello. Programa completo ≈370-431 M€: adquisiciones ≈237 + plataforma logística 133-194.',c:'final'},
+   {f:()=>{map.flyTo([40.2,-4.2],6.0,{duration:2});}}]
+};
+
+/* ================== MOTOR ================== */
+const DUR=120000; let speed=1, t=0, playing=false, last=null, fired=-1;
+const nq=QS.length, perQ=DUR/nq;
+const ticks=document.getElementById('ticks');
+['2S-26','2027','2028','2029','2030'].forEach((y,i)=>{const d=document.createElement('div');d.textContent=y;d.style.flex=(i===0?'2':'4');ticks.appendChild(d);});
+const fmt=(v,d)=>v.toLocaleString('es-ES',{minimumFractionDigits:d,maximumFractionDigits:d});
+function lerp(a,b,f){return a+(b-a)*f;}
+function update(){
+ const q=Math.min(nq-1,Math.floor(t/perQ)); const f=Math.min(1,(t-q*perQ)/perQ);
+ document.getElementById('fill').style.width=(t/DUR*100)+'%';
+ document.getElementById('qlabel').textContent=QS[q];
+ const a=K[q], b=K[Math.min(nq-1,q+1)];
+ document.getElementById('kfact').textContent=fmt(Math.round(lerp(a[0],b[0],f)),0)+' M€';
+ document.getElementById('knodos').textContent=fmt(Math.round(lerp(a[1],b[1],f)),0);
+ document.getElementById('kinv').textContent=fmt(lerp(a[2],b[2],f),1).replace('.',',')+' M€';
+ document.getElementById('kadq').textContent=Math.round(lerp(a[3],b[3],f))+' / 9';
+ showCR(Math.round(lerp(a[4],b[4],f)));
+ while(fired<q){fired++; (EV[fired]||[]).forEach(e=>{ if(e.f)e.f(); if(e.t){const d=document.createElement('div');d.className='hito '+(e.c||'');d.innerHTML='<div class="q">'+QS[fired]+'</div>'+e.t;document.getElementById('feed').prepend(d);} });}
+ if(t>=DUR){playing=false;document.getElementById('play').textContent='▶ Reproducir';document.getElementById('endcard').style.display='flex';}
+}
+function loop(ts){ if(!playing)return; if(last==null)last=ts; t=Math.min(DUR,t+(ts-last)*speed); last=ts; update(); if(playing)requestAnimationFrame(loop); }
+document.getElementById('play').onclick=()=>{ if(t>=DUR)resetAll(); playing=!playing; last=null;
+ document.getElementById('play').textContent=playing?'❚❚ Pausa':'▶ Reproducir'; if(playing)requestAnimationFrame(loop); };
+document.querySelectorAll('.spd').forEach(b=>b.onclick=()=>{speed=+b.dataset.s;document.querySelectorAll('.spd').forEach(x=>x.classList.toggle('on',x===b));});
+document.getElementById('bar').onclick=e=>{const r=e.currentTarget.getBoundingClientRect(); seek((e.clientX-r.left)/r.width*DUR);};
+function seek(nt){ if(nt<t)hardReset(); t=nt; update(); }
+function hardReset(){ Object.values(H).forEach(h=>{map.removeLayer(h.m);map.removeLayer(h.l);}); for(const k in H)delete H[k];
+ if(CL.mk){map.removeLayer(CL.mk);CL.mk=null;} if(CL.lb){map.removeLayer(CL.lb);CL.lb=null;}
+ map.eachLayer(l=>{if(l instanceof L.CircleMarker)map.removeLayer(l);}); crShown=0;
+ actualMk.forEach(m=>m.setOpacity(1)); document.getElementById('feed').innerHTML=''; fired=-1; map.setView([40.42,-3.65],9.2); }
+function resetAll(){ playing=false; document.getElementById('endcard').style.display='none'; document.getElementById('play').textContent='▶ Reproducir'; hardReset(); t=0; update(); }
+document.getElementById('reset').onclick=resetAll;
+update();
+</script>
+</body>
+</html>
