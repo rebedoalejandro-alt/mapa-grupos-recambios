@@ -52,6 +52,10 @@ footer{background:var(--bg);border-top:1px solid var(--br);padding:5px 16px;font
 .mk.build{animation:pulse 1.4s infinite}
 .mklabel{background:var(--az);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;white-space:nowrap;box-shadow:0 1px 3px rgba(0,0,0,.3)}
 .mklabel.gold{background:var(--oro);color:var(--az)}
+#clphoto{position:absolute;left:18px;bottom:44px;z-index:900;width:440px;max-width:38vw;background:#fff;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.35);overflow:hidden;display:none;animation:pop .6s;cursor:pointer;border:1px solid var(--br)}
+#clphoto img{width:100%;display:block}
+#clphoto .cap{padding:7px 12px;font-size:11.5px;color:var(--tx);background:#fff}
+#clphoto .cap b{color:var(--az)}
 #endcard{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(22,51,111,.88);z-index:1000;text-align:center;color:#fff}
 #endcard h2{font-size:42px}#endcard .o{color:var(--oro)}#endcard p{margin-top:10px;font-size:16px;color:#C9D2E4}
 #endcard button{margin-top:22px;background:var(--oro);color:var(--az);font-weight:700;font-size:15px;padding:10px 26px}
@@ -88,6 +92,7 @@ footer{background:var(--bg);border-top:1px solid var(--br);padding:5px 16px;font
   <span class="lg"><span class="dot" style="background:#d9a800;width:7px;height:7px"></span>Centro de reparto</span>
   <span style="margin-left:auto">Los hubs de fuera de Madrid se identifican por número · importes = punto medio de la horquilla del plan</span>
 </footer>
+<div id="clphoto"><img src="cl_render.jpg" alt="Centro Logístico"><div class="cap"><b>El Centro Logístico</b> · 22.000 m², a menos de 30 km de Madrid — recreación</div></div>
 <div id="endcard"><div><h2>UNA RED <span class="o">PARA 500 M€</span></h2><p>1 Centro Logístico · 13 hubs · 121 centros de reparto<br>Programa completo ≈ 334-383 M€: adquisiciones ≈237 + plataforma logística 97-146<br>Los 121 centros de reparto se incorporan montados, sin inversión</p><button onclick="resetAll()">Volver a ver</button></div></div>
 
 <script>
@@ -183,7 +188,7 @@ const EV={
    {f:()=>{setHub('Hub Norte',40.541,-3.635,'op');setHub('Hub regional 4 · Andalucía or.',36.72,-4.42,'op',true);setCL('obra');}}],
 13:[{t:'HUB REGIONAL 5 OPERATIVO. Última adquisición firmada: Galicia (60 M€). Novena operación: 339 M€ de facturación incorporada, coste ≈237 M€.',c:'op'},
    {f:()=>{setHub('Hub regional 5 · Valle del Ebro',41.65,-0.88,'op',true);setHub('Hub regional 7 · Galicia',42.88,-8.54,'build');setHub('Hub regional 8 · Duero',41.65,-4.72,'build');}}],
-14:[{t:'CENTRO LOGÍSTICO A PLENA CARGA — 22.000 m², las cinco familias y el catálogo completo. Chiloeches y Alovera salen de la red. HUB REGIONAL 6 OPERATIVO.',c:'op'},
+14:[{f:()=>{showCLPhoto();}},{t:'CENTRO LOGÍSTICO A PLENA CARGA — 22.000 m², las cinco familias y el catálogo completo. Chiloeches y Alovera salen de la red. HUB REGIONAL 6 OPERATIVO.',c:'op'},
    {f:()=>{setCL('op');setHub('Hub regional 6 · Norte-Cantábrico',43.26,-2.93,'op',true);actualMk[0].setOpacity(.25);actualMk[18].setOpacity(.25);}}],
 15:[{t:'HUB REGIONAL 7 OPERATIVO.',c:'op'},{f:()=>{setHub('Hub regional 7 · Galicia',42.88,-8.54,'op',true);}}],
 16:[{t:'HUB REGIONAL 8 OPERATIVO — RED COMPLETA: 1 CL + 13 hubs + 121 centros de reparto = 135 nodos.',c:'op'},
@@ -192,6 +197,9 @@ const EV={
    {f:()=>{map.flyTo([40.2,-4.2],6.0,{duration:2});}}]
 };
 
+let clpT=null;
+function showCLPhoto(){const d=document.getElementById('clphoto');d.style.display='block';clearTimeout(clpT);clpT=setTimeout(()=>{d.style.display='none';},10000);}
+document.getElementById('clphoto').onclick=function(){this.style.display='none';clearTimeout(clpT);};
 /* ================== MOTOR ================== */
 const DUR=120000; let speed=1, t=0, playing=false, last=null, fired=-1;
 const nq=QS.length, perQ=DUR/nq;
@@ -221,7 +229,7 @@ function seek(nt){ if(nt<t)hardReset(); t=nt; update(); }
 function hardReset(){ Object.values(H).forEach(h=>{map.removeLayer(h.m);map.removeLayer(h.l);}); for(const k in H)delete H[k];
  if(CL.mk){map.removeLayer(CL.mk);CL.mk=null;} if(CL.lb){map.removeLayer(CL.lb);CL.lb=null;}
  map.eachLayer(l=>{if(l instanceof L.CircleMarker)map.removeLayer(l);}); crShown=0;
- actualMk.forEach(m=>m.setOpacity(1)); document.getElementById('feed').innerHTML=''; fired=-1; map.setView([40.42,-3.65],9.2); }
+ actualMk.forEach(m=>m.setOpacity(1)); document.getElementById('clphoto').style.display='none'; clearTimeout(clpT); document.getElementById('feed').innerHTML=''; fired=-1; map.setView([40.42,-3.65],9.2); }
 function resetAll(){ playing=false; document.getElementById('endcard').style.display='none'; document.getElementById('play').textContent='▶ Reproducir'; hardReset(); t=0; update(); }
 document.getElementById('reset').onclick=resetAll;
 update();
