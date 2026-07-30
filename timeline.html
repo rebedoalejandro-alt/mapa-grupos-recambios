@@ -92,7 +92,7 @@ footer{background:var(--bg);border-top:1px solid var(--br);padding:5px 16px;font
   <span class="lg"><span class="dot" style="background:#d9a800;width:7px;height:7px"></span>Centro de reparto</span>
   <span style="margin-left:auto">Los hubs de fuera de Madrid se identifican por número · importes = punto medio de la horquilla del plan</span>
 </footer>
-<div id="clphoto"><img src="cl_render.jpg" alt="Centro Logístico"><div class="cap"><b>El Centro Logístico</b> · 22.000 m², a menos de 30 km de Madrid — recreación</div></div>
+<div id="clphoto"><img id="photoimg" src="cl_render.jpg" alt=""><div class="cap" id="photocap"></div></div>
 <div id="endcard"><div><h2>UNA RED <span class="o">PARA 500 M€</span></h2><p>1 Centro Logístico · 13 hubs · 121 centros de reparto<br>Programa completo ≈ 334-383 M€: adquisiciones ≈237 + plataforma logística 97-146<br>Los 121 centros de reparto se incorporan montados, sin inversión</p><button onclick="resetAll()">Volver a ver</button></div></div>
 
 <script>
@@ -168,7 +168,7 @@ const EV={
    {f:()=>{map.flyTo([40.2,-4.6],6.1,{duration:2.5});setHub('Hub Sur',40.30,-3.72,'build');setHub('Hub regional 1 · Andalucía occ.',37.39,-5.99,'build');}}],
 4:[{t:'Segunda adquisición: Cataluña, 40 M€ (coste ≈28 M€). Compra del Hub Sur en curso.',c:'adq'},
    {f:()=>{setHub('Hub regional 2 · Cataluña',41.39,2.16,'build');}}],
-5:[{t:'HUB ALCALÁ OPERATIVO — primer nodo de la nueva red, con el servicio intacto durante la instalación.',c:'op'},
+5:[{f:()=>{showHubInt();}},{t:'HUB ALCALÁ OPERATIVO — primer nodo de la nueva red, con el servicio intacto durante la instalación.',c:'op'},
    {t:'Licencia de obra del CL concedida. Quince centros de reparto abiertos con el nuevo modelo.',c:'cl'},
    {f:()=>{setHub('Hub Alcalá',40.4819,-3.3635,'op');setCL('obra');}}],
 6:[{t:'Obra del CL iniciada: 22.000 m² con núcleo automático de 58.438 cubetas. Compra del Hub Este.',c:'cl'},
@@ -183,7 +183,7 @@ const EV={
    {f:()=>{setHub('Hub Este',40.423,-3.545,'op');setHub('Hub regional 2 · Cataluña',41.39,2.16,'op',true);}}],
 11:[{t:'HUB REGIONAL 3 OPERATIVO (29 centros de reparto ya montados, el territorio más capilar). Adquisiciones: Norte-Cantábrico (25 M€) y Duero (20 M€).',c:'op'},
    {f:()=>{setHub('Hub regional 3 · Levante',39.47,-0.38,'op',true);setHub('Hub regional 6 · Norte-Cantábrico',43.26,-2.93,'build');}}],
-12:[{t:'MADRID COMPLETO: HUB NORTE OPERATIVO — cinco hubs en servicio. También el HUB REGIONAL 4.',c:'op'},
+12:[{f:()=>{showHubExt();}},{t:'MADRID COMPLETO: HUB NORTE OPERATIVO — cinco hubs en servicio. También el HUB REGIONAL 4.',c:'op'},
    {t:'El CL arranca: automatización instalada y migración por familias desde Chiloeches y Alovera.',c:'cl'},
    {f:()=>{setHub('Hub Norte',40.541,-3.635,'op');setHub('Hub regional 4 · Andalucía or.',36.72,-4.42,'op',true);setCL('obra');}}],
 13:[{t:'HUB REGIONAL 5 OPERATIVO. Última adquisición firmada: Galicia (60 M€). Novena operación: 339 M€ de facturación incorporada, coste ≈237 M€.',c:'op'},
@@ -198,7 +198,10 @@ const EV={
 };
 
 let clpT=null;
-function showCLPhoto(){const d=document.getElementById('clphoto');d.style.display='block';clearTimeout(clpT);clpT=setTimeout(()=>{d.style.display='none';},10000);}
+function showPhoto(src,cap){const d=document.getElementById('clphoto');document.getElementById('photoimg').src=src;document.getElementById('photocap').innerHTML=cap;d.style.display='block';clearTimeout(clpT);clpT=setTimeout(()=>{d.style.display='none';},10000);}
+function showCLPhoto(){showPhoto('cl_render.jpg','<b>El Centro Logístico</b> · 22.000 m², a menos de 30 km de Madrid — recreación');}
+function showHubInt(){showPhoto('hub_int.jpg','<b>Dentro de un hub</b> · grid de cubetas, gran volumen, neumático y cross-dock por ruta — recreación');}
+function showHubExt(){showPhoto('hub_ext.jpg','<b>Un hub</b> · nave comprada de 4.000-5.000 m² en polígono, muelles de reparto — recreación');}
 document.getElementById('clphoto').onclick=function(){this.style.display='none';clearTimeout(clpT);};
 /* ================== MOTOR ================== */
 const DUR=120000; let speed=1, t=0, playing=false, last=null, fired=-1;
