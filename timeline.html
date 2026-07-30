@@ -123,7 +123,7 @@ footer{background:var(--bg);border-top:1px solid var(--br);padding:5px 16px;font
 /* ================== MAPA ================== */
 const map=L.map('map',{zoomControl:false,attributionControl:false}).setView([40.42,-3.65],9.2);
 L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:18}).addTo(map);
-L.control.zoom({position:'bottomleft'}).addTo(map);
+L.control.zoom({position:'topleft'}).addTo(map);
 
 function icon(color,size,build,ring){return L.divIcon({className:'',html:`<div class="mk${build?' build':''}" style="width:${size}px;height:${size}px;background:${color};${ring?'border:2.5px solid '+ring+';':''}"></div>`,iconSize:[size,size],iconAnchor:[size/2,size/2]});}
 function label(txt,gold){return L.divIcon({className:'',html:`<div class="mklabel${gold?' gold':''}">${txt}</div>`,iconSize:null,iconAnchor:[-9,9]});}
@@ -195,7 +195,7 @@ const EV={
 0:[{t:'Arranca el programa: RFP de automatización a cinco proveedores, mandato de búsqueda de la parcela del CL y de las primeras naves de hub.',c:''},
    {t:'La red actual: 17 puntos, 2.644 talleres, entrega media de 56 minutos.',c:''},
    {f:()=>{setCL('busca');}}],
-1:[{f:()=>{showAlcala();}},{t:'OK del piloto: pedido del sistema automático del Hub Alcalá (13-15.000 cubetas). La instalación se hará con el almacén en marcha.',c:'cl'},
+1:[{t:'OK del piloto: pedido del sistema automático del Hub Alcalá (13-15.000 cubetas). La instalación se hará con el almacén en marcha.',c:'cl'},
    {f:()=>{setHub('Hub Alcalá',40.4819,-3.3635,'build');}}],
 2:[{t:'Compra del Hub Oeste en due diligence. Parcela del CL: negociación en el radio de 30 km.',c:''},
    {f:()=>{setHub('Hub Oeste',40.322,-3.865,'build');}}],
@@ -234,7 +234,10 @@ const EV={
 };
 
 let clpT=null;
-function showPhoto(src,cap){const d=document.getElementById('clphoto');document.getElementById('photoimg').src=src;document.getElementById('photocap').innerHTML=cap;d.style.display='block';clearTimeout(clpT);clpT=setTimeout(()=>{d.style.display='none';},10000);}
+let lastSrc='';
+function showPhoto(src,cap){const d=document.getElementById('clphoto');
+ if(src===lastSrc&&d.style.display==='block'){clearTimeout(clpT);clpT=setTimeout(()=>{d.style.display='none';},10000);return;}
+ lastSrc=src;document.getElementById('photoimg').src=src;document.getElementById('photocap').innerHTML=cap;d.style.display='block';clearTimeout(clpT);clpT=setTimeout(()=>{d.style.display='none';},10000);}
 function showCLPhoto(){showPhoto('cl_render.jpg','<b>El Centro Logístico</b> · 22.000 m², a menos de 30 km de Madrid — recreación');}
 function showHubInt(){showPhoto('hub_int.jpg','<b>Dentro de un hub</b> · grid de cubetas, gran volumen, neumático y cross-dock por ruta — recreación');}
 function showHubExt(){showPhoto('hub_ext.jpg','<b>Un hub</b> · nave comprada de 4.000-5.000 m² en polígono, muelles de reparto — recreación');}
@@ -262,7 +265,7 @@ function tiendaDe(ter){let pool=TIENDAS[ter];if(!pool||!pool.length){pool=TIENDA
  return 'tiendas/'+pool[Math.floor(Math.random()*pool.length)];}
 function showCR(ter){showPhoto(tiendaDe(ter),'<b>Centro de reparto</b> · '+(TERNOM[ter]||'la red')+' — foto real de una tienda de la red; los 121 CR ya están montados, sin inversión');}
 function hoverPhoto(kind,name){if(name.indexOf('Alcal')>=0){showAlcala();return;}const h=HOVER[kind];if(!h)return;showPhoto(h[0],'<b>'+name+'</b> · '+h[1]);}
-document.getElementById('clphoto').onclick=function(){this.style.display='none';clearTimeout(clpT);};
+document.getElementById('clphoto').onclick=function(){this.style.display='none';lastSrc='';clearTimeout(clpT);};
 document.querySelectorAll('#gal img').forEach(t=>{t.onclick=()=>{showPhoto(t.getAttribute('src'),t.dataset.cap);clearTimeout(clpT);};});
 /* ================== MOTOR ================== */
 const DUR=120000; let speed=1, t=0, playing=false, last=null, fired=-1;
@@ -302,7 +305,7 @@ function seek(nt){ if(nt<t)hardReset(); t=nt; update(); }
 function hardReset(){ Object.values(H).forEach(h=>{map.removeLayer(h.m);map.removeLayer(h.l);}); for(const k in H)delete H[k];
  if(CL.mk){map.removeLayer(CL.mk);CL.mk=null;} if(CL.lb){map.removeLayer(CL.lb);CL.lb=null;}
  map.eachLayer(l=>{if(l instanceof L.CircleMarker)map.removeLayer(l);}); crShown=0;
- actualMk.forEach(m=>m.setOpacity(1)); document.getElementById('clphoto').style.display='none'; clearTimeout(clpT); document.getElementById('feed').innerHTML=''; fired=-1; map.setView([40.42,-3.65],9.2); }
+ actualMk.forEach(m=>m.setOpacity(1)); document.getElementById('clphoto').style.display='none'; lastSrc=''; clearTimeout(clpT); document.getElementById('feed').innerHTML=''; fired=-1; map.setView([40.42,-3.65],9.2); }
 function resetAll(){ playing=false; document.getElementById('endcard').style.display='none'; document.getElementById('play').textContent='▶ Reproducir'; hardReset(); t=0; update(); }
 document.getElementById('reset').onclick=resetAll;
 update();
