@@ -94,7 +94,7 @@ footer{background:var(--bg);border-top:1px solid var(--br);padding:5px 16px;font
   <span class="lg"><span class="dot" style="background:#16336F"></span>Hub operativo</span>
   <span class="lg"><span class="dot" style="background:#0F6E56"></span>Centro Logístico</span>
   <span class="lg"><span class="dot" style="background:#d9a800;width:7px;height:7px"></span>Centro de reparto</span>
-  <span style="margin-left:auto">Pasa el cursor por un nodo para verlo · Los hubs de fuera de Madrid se identifican por número · importes = punto medio de la horquilla del plan</span>
+  <span style="margin-left:auto">Pasa el cursor por un nodo (o por un centro de reparto) para verlo · Los hubs de fuera de Madrid se identifican por número · importes = punto medio de la horquilla del plan</span>
 </footer>
 <div id="gal"><div class="lb">Imágenes del proyecto</div>
  <img src="alcala_real.jpg" data-cap="<b>Hub Alcalá</b> · la central actual de Reynasa: 526 talleres y el 80,4 % de las piezas — foto real" title="Alcalá hoy">
@@ -145,8 +145,14 @@ const crPools={
  r7:[[42.88,-8.54],[43.30,-8.51],[43.49,-8.19],[43.01,-7.56],[42.34,-7.86],[42.43,-8.64],[42.16,-8.62],[42.59,-8.76],[42.52,-7.51]],
  r8:[[41.65,-4.72],[42.01,-4.53],[40.97,-5.66],[41.50,-5.75]],
  clm:[[39.86,-4.02],[39.96,-4.83],[38.99,-3.93],[38.69,-4.11],[40.07,-2.14],[40.01,-3.00],[39.39,-3.21],[39.16,-3.02],[40.12,-3.85]]};
-let crShown=0; const crQueue=[...crPools.madrid,...crPools.r1,...crPools.r2,...crPools.r3,...crPools.clm,...crPools.r4,...crPools.r5,...crPools.r6,...crPools.r7,...crPools.r8];
-function showCR(n){while(crShown<n&&crShown<crQueue.length){const c=crQueue[crShown++];L.circleMarker([c[0],c[1]],{radius:3.4,color:'#fff',weight:1,fillColor:CRC,fillOpacity:.95}).addTo(map);}}
+let crShown=0; const crQueue=[].concat(
+ crPools.madrid.map(c=>[c[0],c[1],'madrid']), crPools.r1.map(c=>[c[0],c[1],'r1']), crPools.r2.map(c=>[c[0],c[1],'r2']),
+ crPools.r3.map(c=>[c[0],c[1],'r3']), crPools.clm.map(c=>[c[0],c[1],'clm']), crPools.r4.map(c=>[c[0],c[1],'r4']),
+ crPools.r5.map(c=>[c[0],c[1],'r5']), crPools.r6.map(c=>[c[0],c[1],'r6']), crPools.r7.map(c=>[c[0],c[1],'r7']), crPools.r8.map(c=>[c[0],c[1],'r8']));
+function growCR(n){while(crShown<n&&crShown<crQueue.length){const c=crQueue[crShown++];
+ const m=L.circleMarker([c[0],c[1]],{radius:3.4,color:'#fff',weight:1,fillColor:CRC,fillOpacity:.95}).addTo(map);
+ m.bindTooltip('Centro de reparto · '+(TERNOM[c[2]]||''));
+ m.on('mouseover',()=>showCR(c[2]));}}
 
 function setHub(name,lat,lon,state,gold){ // state: build|op
  if(H[name]){map.removeLayer(H[name].m);map.removeLayer(H[name].l);}
@@ -221,6 +227,18 @@ function showAlcala(){showPhoto('alcala_real.jpg','<b>Hub Alcalá</b> · la sede
 function showObra2(){showPhoto('cl_obra2.jpg','<b>Obra del Centro Logístico</b> · cimentación y primeros pilares de la nave de 200 × 100 m — recreación');}
 /* hover: miniatura del nodo */
 const HOVER={cl_busca:['cl_obra1.jpg','Parcela del Centro Logístico · 31.000 m² a menos de 30 km'],cl_obra:['cl_obra2.jpg','Centro Logístico en obra · cimentación y estructura'],cl_op:['cl_render.jpg','Centro Logístico · 22.000 m², 21 muelles'],hub_build:['hub_ext.jpg','Hub en ejecución · nave de 4.000-5.000 m²'],hub_op:['hub_int.jpg','Hub operativo · grid de cubetas y cross-dock']};
+/* fotos reales de tienda por territorio (recambistas del plan) */
+const TIENDAS={
+ madrid:['t_madrid_17.jpg','t_madrid_18.jpg','t_madrid_19.jpg','t_madrid_20.jpg','t_madrid_21.jpg','t_madrid_22.jpg','t_madrid_23.jpg'],
+ r1:['t_r1_9.jpg','t_r1_10.jpg','t_r1_11.jpg'],
+ r2:['t_r2_1.jpg','t_r2_2.jpg','t_r2_3.jpg','t_r2_4.jpg','t_r2_5.jpg','t_r2_6.jpg','t_r2_7.jpg','t_r2_8.jpg'],
+ r3:['t_r3_14.jpg','t_r3_15.jpg','t_r3_24.jpg','t_r3_25.jpg'],
+ r4:['t_r4_13.jpg'], r7:['t_r7_12.jpg'], clm:['t_clm_16.jpg']};
+const TERNOM={madrid:'Madrid',r1:'Andalucía occidental',r2:'Cataluña',r3:'Levante',r4:'Andalucía oriental',r5:'Valle del Ebro',r6:'Norte-Cantábrico',r7:'Galicia',r8:'Duero',clm:'Castilla-La Mancha'};
+const FALLBACK=['madrid','r2','r3','r1'];
+function tiendaDe(ter){let pool=TIENDAS[ter];if(!pool||!pool.length){pool=TIENDAS[FALLBACK[Math.floor(Math.random()*FALLBACK.length)]];}
+ return 'tiendas/'+pool[Math.floor(Math.random()*pool.length)];}
+function showCR(ter){showPhoto(tiendaDe(ter),'<b>Centro de reparto</b> · '+(TERNOM[ter]||'la red')+' — foto real de una tienda de la red; los 121 CR ya están montados, sin inversión');}
 function hoverPhoto(kind,name){if(name.indexOf('Alcal')>=0){showAlcala();return;}const h=HOVER[kind];if(!h)return;showPhoto(h[0],'<b>'+name+'</b> · '+h[1]);}
 document.getElementById('clphoto').onclick=function(){this.style.display='none';clearTimeout(clpT);};
 document.querySelectorAll('#gal img').forEach(t=>{t.onclick=()=>{showPhoto(t.getAttribute('src'),t.dataset.cap);clearTimeout(clpT);};});
@@ -240,7 +258,7 @@ function update(){
  document.getElementById('knodos').textContent=fmt(Math.round(lerp(a[1],b[1],f)),0);
  document.getElementById('kinv').textContent=fmt(lerp(a[2],b[2],f),1).replace('.',',')+' M€';
  document.getElementById('kadq').textContent=Math.round(lerp(a[3],b[3],f))+' / 9';
- showCR(Math.round(lerp(a[4],b[4],f)));
+ growCR(Math.round(lerp(a[4],b[4],f)));
  while(fired<q){fired++; (EV[fired]||[]).forEach(e=>{ if(e.f)e.f(); if(e.t){const d=document.createElement('div');d.className='hito '+(e.c||'');d.innerHTML='<div class="q">'+QS[fired]+'</div>'+e.t;document.getElementById('feed').prepend(d);} });}
  if(t>=DUR){playing=false;document.getElementById('play').textContent='▶ Reproducir';document.getElementById('endcard').style.display='flex';}
 }
