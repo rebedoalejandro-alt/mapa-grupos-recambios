@@ -90,7 +90,7 @@ footer{background:var(--bg);border-top:1px solid var(--br);padding:5px 16px;font
   <span class="lg"><span class="dot" style="background:#16336F"></span>Hub operativo</span>
   <span class="lg"><span class="dot" style="background:#0F6E56"></span>Centro Logístico</span>
   <span class="lg"><span class="dot" style="background:#d9a800;width:7px;height:7px"></span>Centro de reparto</span>
-  <span style="margin-left:auto">Los hubs de fuera de Madrid se identifican por número · importes = punto medio de la horquilla del plan</span>
+  <span style="margin-left:auto">Pasa el cursor por un nodo para verlo · Los hubs de fuera de Madrid se identifican por número · importes = punto medio de la horquilla del plan</span>
 </footer>
 <div id="clphoto"><img id="photoimg" src="cl_render.jpg" alt=""><div class="cap" id="photocap"></div></div>
 <div id="endcard"><div><h2>UNA RED <span class="o">PARA 500 M€</span></h2><p>1 Centro Logístico · 13 hubs · 121 centros de reparto<br>Programa completo ≈ 334-383 M€: adquisiciones ≈237 + plataforma logística 97-146<br>Los 121 centros de reparto se incorporan montados, sin inversión</p><button onclick="resetAll()">Volver a ver</button></div></div>
@@ -139,12 +139,14 @@ function showCR(n){while(crShown<n&&crShown<crQueue.length){const c=crQueue[crSh
 function setHub(name,lat,lon,state,gold){ // state: build|op
  if(H[name]){map.removeLayer(H[name].m);map.removeLayer(H[name].l);}
  const m=L.marker([lat,lon],{icon:icon(state==='build'?ORO:AZ,state==='build'?15:17,state==='build'),zIndexOffset:500}).addTo(map).bindTooltip(name);
+ m.on('mouseover',()=>hoverPhoto(state==='build'?'hub_build':'hub_op',name));
  const l=L.marker([lat,lon],{icon:label(name.split(' · ')[0],gold),zIndexOffset:600}).addTo(map);
  H[name]={m,l};}
 function setCL(state){ // busca|obra|op
  if(CL.mk){map.removeLayer(CL.mk);} if(CL.lb){map.removeLayer(CL.lb);}
  const col=state==='op'?VER:ORO;
  CL.mk=L.marker([CL.lat,CL.lon],{icon:icon(col,state==='op'?22:16,state!=='op'),zIndexOffset:900}).addTo(map).bindTooltip('Centro Logístico · 22.000 m²');
+ CL.mk.on('mouseover',()=>hoverPhoto(state==='op'?'cl_op':(state==='obra'?'cl_obra':'cl_busca'),'Centro Logístico'));
  CL.lb=L.marker([CL.lat,CL.lon],{icon:label(state==='op'?'CENTRO LOGÍSTICO':(state==='obra'?'CL · en obra':'CL · búsqueda de parcela'),state==='op'),zIndexOffset:901}).addTo(map);}
 
 /* ================== GUION ================== */
@@ -171,11 +173,11 @@ const EV={
 5:[{f:()=>{showHubInt();}},{t:'HUB ALCALÁ OPERATIVO — primer nodo de la nueva red, con el servicio intacto durante la instalación.',c:'op'},
    {t:'Licencia de obra del CL concedida. Quince centros de reparto abiertos con el nuevo modelo.',c:'cl'},
    {f:()=>{setHub('Hub Alcalá',40.4819,-3.3635,'op');setCL('obra');}}],
-6:[{t:'Obra del CL iniciada: 22.000 m² con núcleo automático de 58.438 cubetas. Compra del Hub Este.',c:'cl'},
+6:[{f:()=>{showObra();}},{t:'Obra del CL iniciada: 22.000 m² con núcleo automático de 58.438 cubetas. Compra del Hub Este.',c:'cl'},
    {f:()=>{setHub('Hub Este',40.423,-3.545,'build');}}],
 7:[{t:'HUB OESTE OPERATIVO. Tercera y cuarta adquisición: Levante (40 M€) y Valle del Ebro (22 M€).',c:'op'},
    {f:()=>{setHub('Hub Oeste',40.322,-3.865,'op');setHub('Hub regional 3 · Levante',39.47,-0.38,'build');setHub('Hub regional 5 · Valle del Ebro',41.65,-0.88,'build');}}],
-8:[{t:'HUB SUR OPERATIVO — el más cargado de la red (633 talleres). Compra del Hub Norte. Adquisiciones: Andalucía oriental (18 M€) y Castilla-La Mancha (24 M€).',c:'op'},
+8:[{f:()=>{showObra2();}},{t:'HUB SUR OPERATIVO — el más cargado de la red (633 talleres). Compra del Hub Norte. Adquisiciones: Andalucía oriental (18 M€) y Castilla-La Mancha (24 M€).',c:'op'},
    {f:()=>{setHub('Hub Sur',40.30,-3.72,'op');setHub('Hub Norte',40.541,-3.635,'build');setHub('Hub regional 4 · Andalucía or.',36.72,-4.42,'build');}}],
 9:[{t:'HUB REGIONAL 1 OPERATIVO — primer territorio fuera de Madrid integrado, con sus 19 centros de reparto incorporados ya montados, sin inversión.',c:'op'},
    {f:()=>{setHub('Hub regional 1 · Andalucía occ.',37.39,-5.99,'op',true);}}],
@@ -202,6 +204,11 @@ function showPhoto(src,cap){const d=document.getElementById('clphoto');document.
 function showCLPhoto(){showPhoto('cl_render.jpg','<b>El Centro Logístico</b> · 22.000 m², a menos de 30 km de Madrid — recreación');}
 function showHubInt(){showPhoto('hub_int.jpg','<b>Dentro de un hub</b> · grid de cubetas, gran volumen, neumático y cross-dock por ruta — recreación');}
 function showHubExt(){showPhoto('hub_ext.jpg','<b>Un hub</b> · nave comprada de 4.000-5.000 m² en polígono, muelles de reparto — recreación');}
+function showObra(){showPhoto('cl_obra1.jpg','<b>Obra del Centro Logístico</b> · movimiento de tierras en la parcela de 31.000 m² — recreación');}
+function showObra2(){showPhoto('cl_obra2.jpg','<b>Obra del Centro Logístico</b> · cimentación y primeros pilares de la nave de 200 × 100 m — recreación');}
+/* hover: miniatura del nodo */
+const HOVER={cl_busca:['cl_obra1.jpg','Parcela del Centro Logístico · 31.000 m² a menos de 30 km'],cl_obra:['cl_obra2.jpg','Centro Logístico en obra · cimentación y estructura'],cl_op:['cl_render.jpg','Centro Logístico · 22.000 m², 21 muelles'],hub_build:['hub_ext.jpg','Hub en ejecución · nave de 4.000-5.000 m²'],hub_op:['hub_int.jpg','Hub operativo · grid de cubetas y cross-dock']};
+function hoverPhoto(kind,name){const h=HOVER[kind];if(!h)return;showPhoto(h[0],'<b>'+name+'</b> · '+h[1]);}
 document.getElementById('clphoto').onclick=function(){this.style.display='none';clearTimeout(clpT);};
 /* ================== MOTOR ================== */
 const DUR=120000; let speed=1, t=0, playing=false, last=null, fired=-1;
