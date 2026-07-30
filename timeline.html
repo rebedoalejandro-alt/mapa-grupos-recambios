@@ -161,7 +161,7 @@ const EV={
 0:[{t:'Arranca el programa: RFP de automatización a cinco proveedores, mandato de búsqueda de la parcela del CL y de las primeras naves de hub.',c:''},
    {t:'La red actual: 17 puntos, 2.644 talleres, entrega media de 56 minutos.',c:''},
    {f:()=>{setCL('busca');}}],
-1:[{t:'OK del piloto: pedido del sistema automático del Hub Alcalá (13-15.000 cubetas). La instalación se hará con el almacén en marcha.',c:'cl'},
+1:[{f:()=>{showAlcala();}},{t:'OK del piloto: pedido del sistema automático del Hub Alcalá (13-15.000 cubetas). La instalación se hará con el almacén en marcha.',c:'cl'},
    {f:()=>{setHub('Hub Alcalá',40.4819,-3.3635,'build');}}],
 2:[{t:'Compra del Hub Oeste en due diligence. Parcela del CL: negociación en el radio de 30 km.',c:''},
    {f:()=>{setHub('Hub Oeste',40.322,-3.865,'build');}}],
@@ -170,7 +170,7 @@ const EV={
    {f:()=>{map.flyTo([40.2,-4.6],6.1,{duration:2.5});setHub('Hub Sur',40.30,-3.72,'build');setHub('Hub regional 1 · Andalucía occ.',37.39,-5.99,'build');}}],
 4:[{t:'Segunda adquisición: Cataluña, 40 M€ (coste ≈28 M€). Compra del Hub Sur en curso.',c:'adq'},
    {f:()=>{setHub('Hub regional 2 · Cataluña',41.39,2.16,'build');}}],
-5:[{f:()=>{showHubInt();}},{t:'HUB ALCALÁ OPERATIVO — primer nodo de la nueva red, con el servicio intacto durante la instalación.',c:'op'},
+5:[{f:()=>{showAlcala();}},{t:'HUB ALCALÁ OPERATIVO — primer nodo de la nueva red, con el servicio intacto durante la instalación.',c:'op'},
    {t:'Licencia de obra del CL concedida. Quince centros de reparto abiertos con el nuevo modelo.',c:'cl'},
    {f:()=>{setHub('Hub Alcalá',40.4819,-3.3635,'op');setCL('obra');}}],
 6:[{f:()=>{showObra();}},{t:'Obra del CL iniciada: 22.000 m² con núcleo automático de 58.438 cubetas. Compra del Hub Este.',c:'cl'},
@@ -181,7 +181,7 @@ const EV={
    {f:()=>{setHub('Hub Sur',40.30,-3.72,'op');setHub('Hub Norte',40.541,-3.635,'build');setHub('Hub regional 4 · Andalucía or.',36.72,-4.42,'build');}}],
 9:[{t:'HUB REGIONAL 1 OPERATIVO — primer territorio fuera de Madrid integrado, con sus 19 centros de reparto incorporados ya montados, sin inversión.',c:'op'},
    {f:()=>{setHub('Hub regional 1 · Andalucía occ.',37.39,-5.99,'op',true);}}],
-10:[{t:'HUB ESTE y HUB REGIONAL 2 OPERATIVOS. El CL, a mitad de obra.',c:'op'},
+10:[{f:()=>{showHubInt();}},{t:'HUB ESTE y HUB REGIONAL 2 OPERATIVOS. El CL, a mitad de obra.',c:'op'},
    {f:()=>{setHub('Hub Este',40.423,-3.545,'op');setHub('Hub regional 2 · Cataluña',41.39,2.16,'op',true);}}],
 11:[{t:'HUB REGIONAL 3 OPERATIVO (29 centros de reparto ya montados, el territorio más capilar). Adquisiciones: Norte-Cantábrico (25 M€) y Duero (20 M€).',c:'op'},
    {f:()=>{setHub('Hub regional 3 · Levante',39.47,-0.38,'op',true);setHub('Hub regional 6 · Norte-Cantábrico',43.26,-2.93,'build');}}],
@@ -205,10 +205,11 @@ function showCLPhoto(){showPhoto('cl_render.jpg','<b>El Centro Logístico</b> ·
 function showHubInt(){showPhoto('hub_int.jpg','<b>Dentro de un hub</b> · grid de cubetas, gran volumen, neumático y cross-dock por ruta — recreación');}
 function showHubExt(){showPhoto('hub_ext.jpg','<b>Un hub</b> · nave comprada de 4.000-5.000 m² en polígono, muelles de reparto — recreación');}
 function showObra(){showPhoto('cl_obra1.jpg','<b>Obra del Centro Logístico</b> · movimiento de tierras en la parcela de 31.000 m² — recreación');}
+function showAlcala(){showPhoto('alcala_real.jpg','<b>Hub Alcalá</b> · la sede central actual de Reynasa: 526 talleres y el 80,4 % de las piezas de la compañía — foto real');}
 function showObra2(){showPhoto('cl_obra2.jpg','<b>Obra del Centro Logístico</b> · cimentación y primeros pilares de la nave de 200 × 100 m — recreación');}
 /* hover: miniatura del nodo */
 const HOVER={cl_busca:['cl_obra1.jpg','Parcela del Centro Logístico · 31.000 m² a menos de 30 km'],cl_obra:['cl_obra2.jpg','Centro Logístico en obra · cimentación y estructura'],cl_op:['cl_render.jpg','Centro Logístico · 22.000 m², 21 muelles'],hub_build:['hub_ext.jpg','Hub en ejecución · nave de 4.000-5.000 m²'],hub_op:['hub_int.jpg','Hub operativo · grid de cubetas y cross-dock']};
-function hoverPhoto(kind,name){const h=HOVER[kind];if(!h)return;showPhoto(h[0],'<b>'+name+'</b> · '+h[1]);}
+function hoverPhoto(kind,name){if(name.indexOf('Alcal')>=0){showAlcala();return;}const h=HOVER[kind];if(!h)return;showPhoto(h[0],'<b>'+name+'</b> · '+h[1]);}
 document.getElementById('clphoto').onclick=function(){this.style.display='none';clearTimeout(clpT);};
 /* ================== MOTOR ================== */
 const DUR=120000; let speed=1, t=0, playing=false, last=null, fired=-1;
