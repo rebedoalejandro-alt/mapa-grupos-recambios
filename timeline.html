@@ -110,7 +110,7 @@ footer{background:var(--bg);border-top:1px solid var(--br);padding:5px 16px;font
  <img src="alcala_real.jpg" data-cap="<b>Hub Alcalá</b> · la central actual de Reynasa: 526 talleres y el 80,4 % de las piezas — foto real" title="Alcalá hoy">
  <img src="cl_obra1.jpg" data-cap="<b>Obra del CL</b> · movimiento de tierras en la parcela de 31.000 m² — recreación" title="CL: movimiento de tierras">
  <img src="cl_obra2.jpg" data-cap="<b>Obra del CL</b> · cimentación y primeros pilares de la nave de 200 × 100 m — recreación" title="CL: cimentación">
- <img src="cl_obra3.jpg" data-cap="<b>Obra del CL</b> · estructura y cerramiento montados, cubierta aún abierta y muelles en ejecución — recreación" title="CL: estructura">
+ <img src="cl_obra3.jpg" data-cap="<b>Obra del CL</b> · estructura y cerramiento, cubierta abierta y muelles en ejecución — recreación" title="CL: estructura">
  <img src="cl_render.jpg" data-cap="<b>El Centro Logístico</b> · 22.000 m², 21 muelles, a menos de 30 km de Madrid — recreación" title="CL terminado">
  <img src="hub_ext.jpg" data-cap="<b>Un hub</b> · nave comprada de 4.000-5.000 m² en polígono, muelles de reparto — recreación" title="Hub por fuera">
  <img src="hub_int.jpg" data-cap="<b>Dentro de un hub</b> · grid de cubetas, gran volumen, neumático y cross-dock por ruta — recreación" title="Hub por dentro">
@@ -246,20 +246,20 @@ function showObra2(){showPhoto('cl_obra2.jpg','<b>Obra del Centro Logístico</b>
 const HOVER={cl_busca:['cl_obra1.jpg','Parcela del Centro Logístico · 31.000 m² a menos de 30 km'],cl_obra:['cl_obra2.jpg','Centro Logístico en obra · cimentación y estructura'],cl_op:['cl_render.jpg','Centro Logístico · 22.000 m², 21 muelles'],hub_build:['hub_ext.jpg','Hub en ejecución · nave de 4.000-5.000 m²'],hub_op:['hub_int.jpg','Hub operativo · grid de cubetas y cross-dock']};
 /* fotos reales de tienda por territorio (recambistas del plan) */
 const TIENDAS={
- madrid:["t_madrid_1.jpg", "t_madrid_2.jpg", "t_madrid_3.jpg", "t_madrid_4.jpg", "t_madrid_5.jpg"],
- r1:["t_r1_1.jpg", "t_r1_2.jpg", "t_r1_3.jpg", "t_r1_4.jpg"],
- r2:["t_r2_1.jpg", "t_r2_2.jpg", "t_r2_3.jpg", "t_r2_4.jpg", "t_r2_5.jpg"],
- r3:["t_r3_1.jpg", "t_r3_2.jpg", "t_r3_3.jpg", "t_r3_4.jpg", "t_r3_5.jpg"],
- r4:["t_r4_1.jpg", "t_r4_2.jpg", "t_r4_3.jpg", "t_r4_4.jpg", "t_r4_5.jpg"],
- r5:["t_r5_1.jpg", "t_r5_2.jpg", "t_r5_3.jpg"],
- r6:["t_r6_1.jpg", "t_r6_2.jpg"],
- r7:["t_r7_1.jpg", "t_r7_2.jpg", "t_r7_3.jpg", "t_r7_4.jpg", "t_r7_5.jpg"],
- r8:["t_r8_1.jpg", "t_r8_2.jpg", "t_r8_3.jpg", "t_r8_4.jpg", "t_r8_5.jpg"],
- clm:["t_clm_1.jpg", "t_clm_2.jpg", "t_clm_3.jpg", "t_clm_4.jpg", "t_clm_5.jpg"]};
+ madrid:['t_madrid_17.jpg','t_madrid_18.jpg','t_madrid_19.jpg','t_madrid_20.jpg','t_madrid_21.jpg','t_madrid_22.jpg','t_madrid_23.jpg'],
+ r1:['t_r1_9.jpg','t_r1_10.jpg','t_r1_11.jpg'],
+ r2:['t_r2_1.jpg','t_r2_2.jpg','t_r2_3.jpg','t_r2_4.jpg','t_r2_5.jpg','t_r2_6.jpg','t_r2_7.jpg','t_r2_8.jpg'],
+ r3:['t_r3_14.jpg','t_r3_15.jpg','t_r3_24.jpg','t_r3_25.jpg'],
+ r4:['t_r4_13.jpg'],
+ r5:['t_r2_1.jpg','t_r2_5.jpg'],
+ r6:['t_r7_12.jpg'],
+ r7:['t_r7_12.jpg'],
+ r8:['t_clm_16.jpg','t_madrid_19.jpg'],
+ clm:['t_clm_16.jpg']};
 const TERNOM={madrid:'Madrid',r1:'Andalucía occidental',r2:'Cataluña',r3:'Levante',r4:'Andalucía oriental',r5:'Valle del Ebro',r6:'Norte-Cantábrico',r7:'Galicia',r8:'Duero',clm:'Castilla-La Mancha'};
 const FALLBACK=['madrid','r2','r3','r1'];
 function tiendaDe(ter){let pool=TIENDAS[ter];if(!pool||!pool.length){pool=TIENDAS[FALLBACK[Math.floor(Math.random()*FALLBACK.length)]];}
- return pool[Math.floor(Math.random()*pool.length)];}
+ return 'tiendas/'+pool[Math.floor(Math.random()*pool.length)];}
 function showCR(ter){showPhoto(tiendaDe(ter),'<b>Centro de reparto</b> · '+(TERNOM[ter]||'la red')+' — foto real de una tienda de la red; los 121 CR ya están montados, sin inversión');}
 function hoverPhoto(kind,name){if(name.indexOf('Alcal')>=0){showAlcala();return;}const h=HOVER[kind];if(!h)return;showPhoto(h[0],'<b>'+name+'</b> · '+h[1]);}
 document.getElementById('clphoto').onclick=function(){this.style.display='none';clearTimeout(clpT);};
