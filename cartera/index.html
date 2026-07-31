@@ -155,7 +155,7 @@ let DATA, GEO, CPXY = null;
 let segIdx = -1;          // -1 = total general
 let view = 'prov';        // prov | loc | dens
 let mode = 'abs';         // abs | pct
-let breaks = [], activeProv = null, HOME = null;
+let breaks = [], activeProv = null;
 
 const map = L.map('map', { zoomControl:true, minZoom:5, maxZoom:15, preferCanvas:true })
   .setView([40.2, -3.6], 6);
@@ -198,8 +198,6 @@ async function boot(){
 
   buildSegChips();
   drawProvinces();
-  HOME = provLayer.getBounds();          // incluye Canarias, Ceuta y Melilla
-  map.fitBounds(HOME, { padding:[12,12] });
   document.getElementById('load').remove();
   render();
   loadCP();   // en segundo plano
@@ -391,7 +389,7 @@ function selectProv(code){
   activeProv = activeProv === code ? null : code;
   const f = GEO.features.find(x => x.properties.cod_prov === code);
   if(activeProv && f) map.fitBounds(L.geoJSON(f).getBounds(), { padding:[30,30] });
-  else if(HOME) map.fitBounds(HOME, { padding:[12,12] });
+  else map.flyTo([40.2,-3.6], 6, { duration:.6 });
   provLayer.setStyle(styleProv);
   drawRank();
 }
