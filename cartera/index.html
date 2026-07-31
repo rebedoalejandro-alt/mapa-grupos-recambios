@@ -58,7 +58,7 @@ input[type=search]::placeholder{color:#5d6b7c}
 #rank .it .nm{flex:1 1 auto; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 #rank .it .nm em{display:block; font-style:normal; color:#5d6b7c; font-size:10.5px}
 #rank .it .vl{font-variant-numeric:tabular-nums; color:var(--ink); font-weight:600}
-#rank .it .pc{font-variant-numeric:tabular-nums; color:var(--muted); font-size:11px; width:44px; text-align:right}
+#rank .it .pc{font-variant-numeric:tabular-nums; color:var(--muted); font-size:11px; width:56px; text-align:right}
 #rank .bar{height:3px; background:var(--accent); border-radius:2px; opacity:.5}
 .legend{background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:9px 11px; color:var(--ink); box-shadow:0 4px 18px rgba(0,0,0,.45)}
 .legend h3{margin:0 0 6px; font-size:10px; text-transform:uppercase; letter-spacing:.7px; color:var(--muted); font-weight:600}
@@ -155,7 +155,7 @@ let DATA, GEO, CPXY = null;
 let segIdx = -1;          // -1 = total general
 let view = 'prov';        // prov | loc | dens
 let mode = 'abs';         // abs | pct
-let breaks = [], activeProv = null;
+let breaks = [], activeProv = null, HOME = null;
 
 const map = L.map('map', { zoomControl:true, minZoom:5, maxZoom:15, preferCanvas:true })
   .setView([40.2, -3.6], 6);
@@ -198,6 +198,8 @@ async function boot(){
 
   buildSegChips();
   drawProvinces();
+  HOME = provLayer.getBounds();          // incluye Canarias, Ceuta y Melilla
+  map.fitBounds(HOME, { padding:[12,12] });
   document.getElementById('load').remove();
   render();
   loadCP();   // en segundo plano
@@ -370,8 +372,8 @@ function drawRank(){
       <span style="color:#5d6b7c;width:22px;font-variant-numeric:tabular-nums">${k+1}</span>
       <span class="nm">${esc(i.nm)}${i.sub ? `<em>${esc(i.sub)}</em>` : ''}
         <span class="bar" style="display:block;width:${Math.max(2, i.m/max*100)}%"></span></span>
-      <span class="vl">${fmt(i.v)}</span>
-      <span class="pc">${tot ? pct(i.v/tot*100) : '—'}</span>
+      <span class="vl">${mode === 'pct' ? pct(i.m) : fmt(i.v)}</span>
+      <span class="pc">${mode === 'pct' ? fmt(i.v) : (tot ? pct(i.v/tot*100) : '—')}</span>
     </div>`).join('') || '<div class="note" style="padding-top:10px">Sin resultados.</div>';
 
   [...box.querySelectorAll('.it')].forEach(el => el.onclick = () => {
@@ -389,7 +391,7 @@ function selectProv(code){
   activeProv = activeProv === code ? null : code;
   const f = GEO.features.find(x => x.properties.cod_prov === code);
   if(activeProv && f) map.fitBounds(L.geoJSON(f).getBounds(), { padding:[30,30] });
-  else map.flyTo([40.2,-3.6], 6, { duration:.6 });
+  else if(HOME) map.fitBounds(HOME, { padding:[12,12] });
   provLayer.setStyle(styleProv);
   drawRank();
 }
