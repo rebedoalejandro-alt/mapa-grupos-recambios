@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mapa de calor — Cartera en vigor julio 2026</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{
+  --bg:#0c0f14; --panel:#141a22; --ink:#e8eef5; --muted:#94a2b2; --line:#262f3a; --accent:#4c8dff;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:var(--bg); color:var(--ink);
+  font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  display:flex; flex-direction:column; overflow:hidden;
+}
+header{
+  padding:10px 16px; border-bottom:1px solid var(--line); background:var(--panel);
+  display:flex; align-items:center; gap:18px; flex-wrap:wrap; flex:0 0 auto;
+}
+header h1{font-size:15px; margin:0; font-weight:600; letter-spacing:.2px}
+header h1 small{display:block; color:var(--muted); font-weight:400; font-size:11px; letter-spacing:0}
+.kpis{display:flex; gap:18px; margin-left:auto; flex-wrap:wrap}
+.kpi{text-align:right}
+.kpi b{display:block; font-size:17px; font-variant-numeric:tabular-nums}
+.kpi span{font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.6px}
+main{flex:1 1 auto; display:flex; min-height:0}
+#side{
+  width:330px; flex:0 0 330px; background:var(--panel); border-right:1px solid var(--line);
+  display:flex; flex-direction:column; min-height:0;
+}
+#map{flex:1 1 auto; background:#0c0f14}
+.blk{padding:12px 14px; border-bottom:1px solid var(--line)}
+.blk h2{font-size:10px; text-transform:uppercase; letter-spacing:.7px; color:var(--muted); margin:0 0 8px}
+.chips{display:flex; flex-wrap:wrap; gap:5px}
+button.chip{
+  font:inherit; font-size:12px; cursor:pointer; padding:4px 9px; border-radius:999px;
+  background:#0f141b; color:var(--muted); border:1px solid var(--line);
+}
+button.chip:hover{color:var(--ink); border-color:#3a4756}
+button.chip.on{background:var(--accent); border-color:var(--accent); color:#06101f; font-weight:600}
+.seg-tot.on{background:#e8eef5; border-color:#e8eef5; color:#0c0f14}
+.row{display:flex; gap:5px}
+.row button.chip{flex:1; text-align:center}
+input[type=search]{
+  width:100%; font:inherit; font-size:13px; padding:6px 9px; border-radius:6px;
+  background:#0f141b; border:1px solid var(--line); color:var(--ink);
+}
+input[type=search]::placeholder{color:#5d6b7c}
+#rank{flex:1 1 auto; overflow:auto; padding:4px 0 20px}
+#rank .it{
+  display:flex; align-items:center; gap:8px; padding:5px 14px; cursor:pointer; font-size:12.5px;
+  border-left:3px solid transparent;
+}
+#rank .it:hover{background:#1a2129; border-left-color:var(--accent)}
+#rank .it .nm{flex:1 1 auto; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+#rank .it .nm em{display:block; font-style:normal; color:#5d6b7c; font-size:10.5px}
+#rank .it .vl{font-variant-numeric:tabular-nums; color:var(--ink); font-weight:600}
+#rank .it .pc{font-variant-numeric:tabular-nums; color:var(--muted); font-size:11px; width:44px; text-align:right}
+#rank .bar{height:3px; background:var(--accent); border-radius:2px; opacity:.5}
+.legend{background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:9px 11px; color:var(--ink); box-shadow:0 4px 18px rgba(0,0,0,.45)}
+.legend h3{margin:0 0 6px; font-size:10px; text-transform:uppercase; letter-spacing:.7px; color:var(--muted); font-weight:600}
+.legend .sc{display:flex; height:9px; border-radius:3px; overflow:hidden; min-width:190px}
+.legend .sc i{flex:1}
+.legend .lb{display:flex; justify-content:space-between; font-size:10px; color:var(--muted); margin-top:3px; font-variant-numeric:tabular-nums}
+.leaflet-container{background:#0c0f14; font:inherit}
+.leaflet-tooltip.tt{
+  background:var(--panel); border:1px solid var(--line); color:var(--ink); border-radius:7px;
+  box-shadow:0 4px 18px rgba(0,0,0,.5); font-size:12px; padding:8px 10px;
+}
+.leaflet-tooltip.tt:before{display:none}
+.tt b{font-size:13px}
+.tt table{border-collapse:collapse; margin-top:5px; font-size:11px}
+.tt td{padding:1px 0}
+.tt td:last-child{text-align:right; padding-left:14px; font-variant-numeric:tabular-nums; color:var(--muted)}
+.tt .big{font-size:16px; font-weight:700; font-variant-numeric:tabular-nums}
+.note{font-size:11px; color:#5d6b7c; padding:0 14px 12px; line-height:1.4}
+#load{
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center; z-index:900;
+  background:rgba(12,15,20,.92); color:var(--muted); font-size:13px; flex-direction:column; gap:8px;
+}
+.spin{width:22px;height:22px;border:2px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:sp .8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (max-width:820px){
+  main{flex-direction:column} #side{width:auto; flex:0 0 auto; max-height:46vh; border-right:0; border-bottom:1px solid var(--line)}
+  #map{min-height:54vh}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Mapa de calor — Cartera en vigor
+    <small>Julio 2026 · pólizas por provincia, localidad y segmento</small>
+  </h1>
+  <div class="kpis">
+    <div class="kpi"><b id="k1">—</b><span id="k1l">Pólizas</span></div>
+    <div class="kpi"><b id="k2">—</b><span>Provincias</span></div>
+    <div class="kpi"><b id="k3">—</b><span>Localidades</span></div>
+  </div>
+</header>
+
+<main>
+  <div id="side">
+    <div class="blk">
+      <h2>Segmento</h2>
+      <div class="chips" id="segs"></div>
+    </div>
+    <div class="blk">
+      <h2>Vista</h2>
+      <div class="row" id="views">
+        <button class="chip on" data-v="prov">Provincias</button>
+        <button class="chip" data-v="loc">Localidades</button>
+        <button class="chip" data-v="dens">Densidad</button>
+      </div>
+      <div class="row" style="margin-top:6px" id="modes">
+        <button class="chip on" data-m="abs">Nº de pólizas</button>
+        <button class="chip" data-m="pct">% cuota del segmento</button>
+      </div>
+    </div>
+    <div class="blk">
+      <input type="search" id="q" placeholder="Buscar provincia o localidad…" autocomplete="off">
+    </div>
+    <div class="blk" style="border-bottom:0;padding-bottom:4px">
+      <h2 id="rankh">Ranking</h2>
+    </div>
+    <div id="rank"></div>
+    <div class="note" id="foot"></div>
+  </div>
+  <div id="map"><div id="load"><div class="spin"></div><span>Cargando geografía…</span></div></div>
+</main>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+<script>
+/* ============================================================
+   Mapa de calor de cartera — Aurgi / MMMN
+   Datos: datos.json (agregados; sin datos personales)
+   Geografía: click_that_hood (provincias) + GeoNames (CP -> lat/lon)
+   ============================================================ */
+
+const GEOJSON = 'https://cdn.jsdelivr.net/gh/codeforgermany/click_that_hood@main/public/data/spain-provinces.geojson';
+const CPCSV   = 'https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/geonames-postal-code/exports/csv?where=country_code%3D%22ES%22&limit=-1';
+const CACHE_K = 'cp-es-v1';
+
+const RAMP = ['#fff7bc','#fee391','#fec44f','#fe9929','#ec7014','#cc4c02','#8c2d04'];
+const NF = new Intl.NumberFormat('es-ES');
+const fmt = v => NF.format(Math.round(v));
+const fmtK = v => v>=1e6 ? (v/1e6).toFixed(2).replace('.',',')+' M' : v>=1e4 ? Math.round(v/1e3)+'k' : NF.format(v);
+const pct = v => (Math.round(v*10)/10).toString().replace('.',',')+'%';
+
+let DATA, GEO, CPXY = null;
+let segIdx = -1;          // -1 = total general
+let view = 'prov';        // prov | loc | dens
+let mode = 'abs';         // abs | pct
+let breaks = [], activeProv = null;
+
+const map = L.map('map', { zoomControl:true, minZoom:5, maxZoom:15, preferCanvas:true })
+  .setView([40.2, -3.6], 6);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+  subdomains:'abcd', maxZoom:19,
+  attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/attributions">CARTO</a> · CP: GeoNames'
+}).addTo(map);
+
+const canvas = L.canvas({ padding:.4 });
+let provLayer = null, locLayer = null, densLayer = null;
+
+/* ---------- valores ---------- */
+const valOf = o => segIdx < 0 ? o.t : o.s[segIdx];
+const shareOf = o => o.t ? (segIdx < 0 ? 100 : o.s[segIdx] / o.t * 100) : 0;
+const metric = o => mode === 'pct' ? shareOf(o) : valOf(o);
+
+function quantiles(vals, n){
+  const a = vals.filter(v => v > 0).sort((x,y)=>x-y);
+  if(!a.length) return [0];
+  const out = [];
+  for(let i=1;i<n;i++) out.push(a[Math.floor(i*a.length/n)]);
+  return [...new Set(out)];
+}
+function colorFor(v){
+  if(!(v > 0)) return '#e9edf1';
+  let i = 0; while(i < breaks.length && v > breaks[i]) i++;
+  return RAMP[Math.min(i, RAMP.length-1)];
+}
+
+/* ---------- carga ---------- */
+async function boot(){
+  const [d, g] = await Promise.all([
+    fetch('datos.json').then(r=>r.json()),
+    fetch(GEOJSON).then(r=>r.json())
+  ]);
+  DATA = d; GEO = g;
+  DATA.byProv = {}; DATA.locByProv = {};
+  DATA.prov.forEach(p => DATA.byProv[p.c] = p);
+  DATA.loc.forEach(l => (DATA.locByProv[l.c] = DATA.locByProv[l.c] || []).push(l));
+
+  buildSegChips();
+  drawProvinces();
+  document.getElementById('load').remove();
+  render();
+  loadCP();   // en segundo plano
+}
+
+function buildSegChips(){
+  const c = document.getElementById('segs');
+  const mk = (label, idx, extra='') => {
+    const b = document.createElement('button');
+    b.className = 'chip' + extra + (idx === segIdx ? ' on' : '');
+    b.textContent = label; b.dataset.i = idx;
+    b.onclick = () => { segIdx = idx; [...c.children].forEach(x=>x.classList.toggle('on', +x.dataset.i === segIdx)); render(); };
+    c.appendChild(b);
+  };
+  mk('Total general', -1, ' seg-tot');
+  DATA.seg.forEach((s,i) => mk(s, i));
+}
+
+function drawProvinces(){
+  provLayer = L.geoJSON(GEO, {
+    style: f => styleProv(f),
+    onEachFeature: (f, layer) => {
+      const p = DATA.byProv[f.properties.cod_prov];
+      layer.on({
+        mouseover: e => { e.target.setStyle({ weight:2, color:'#0c0f14' }); e.target.bringToFront(); },
+        mouseout:  e => provLayer.resetStyle(e.target),
+        click: () => selectProv(f.properties.cod_prov)
+      });
+      layer.bindTooltip(() => tipProv(p), { className:'tt', sticky:true });
+    }
+  }).addTo(map);
+}
+
+function styleProv(f){
+  const p = DATA.byProv[f.properties.cod_prov];
+  const on = view === 'prov';
+  return {
+    fillColor: on && p ? colorFor(metric(p)) : '#ffffff',
+    fillOpacity: on ? .82 : .02,
+    weight: activeProv === f.properties.cod_prov ? 2.2 : .7,
+    color: on ? '#6b7684' : '#8895a5',
+    opacity: on ? .9 : .55
+  };
+}
+
+function tipProv(p){
+  if(!p) return 'Sin datos';
+  const v = valOf(p);
+  const rows = DATA.seg.map((s,i) =>
+    `<tr><td style="${i===segIdx?'color:#e8eef5;font-weight:600':''}">${s}</td><td>${fmt(p.s[i])}</td></tr>`).join('');
+  return `<b>${p.n}</b><div class="big">${fmt(v)}</div>
+    <div style="color:#94a2b2;font-size:11px">${segIdx<0?'total pólizas':DATA.seg[segIdx]+' · '+pct(shareOf(p))+' de la provincia'}</div>
+    <table>${rows}<tr><td style="border-top:1px solid #262f3a;padding-top:3px">Total</td>
+    <td style="border-top:1px solid #262f3a;padding-top:3px;color:#e8eef5">${fmt(p.t)}</td></tr></table>
+    <div style="color:#5d6b7c;font-size:10px;margin-top:5px">clic para ver localidades</div>`;
+}
+
+/* ---------- localidades ---------- */
+async function loadCP(){
+  try{
+    let txt = null;
+    try{ txt = localStorage.getItem(CACHE_K); }catch(e){}
+    if(!txt){
+      const r = await fetch(CPCSV);
+      if(!r.ok) throw new Error('CP ' + r.status);
+      const csv = await r.text();
+      const idx = {};
+      csv.split(/\r?\n/).slice(1).forEach(line => {
+        const c = line.split(';');
+        const cp = (c[1]||'').trim(), la = parseFloat(c[9]), lo = parseFloat(c[10]);
+        if(cp && !idx[cp] && isFinite(la) && isFinite(lo)) idx[cp] = [la, lo];
+      });
+      // guardamos sólo los CP que usamos -> cache pequeña
+      const need = {};
+      DATA.loc.forEach(l => { if(idx[l.cp]) need[l.cp] = idx[l.cp]; });
+      txt = JSON.stringify(need);
+      try{ localStorage.setItem(CACHE_K, txt); }catch(e){}
+    }
+    CPXY = JSON.parse(txt);
+    const hit = DATA.loc.filter(l => CPXY[l.cp]).length;
+    document.getElementById('foot').innerHTML =
+      `Geolocalización por código postal: ${fmt(hit)} de ${fmt(DATA.loc.length)} localidades (${pct(hit/DATA.loc.length*100)}).`;
+    if(view !== 'prov') render();
+  }catch(e){
+    CPXY = 'err';
+    document.getElementById('foot').textContent = 'No se han podido cargar las coordenadas de los códigos postales; las vistas de localidad no están disponibles.';
+  }
+}
+
+function locPoints(){
+  if(!CPXY || CPXY === 'err') return [];
+  return DATA.loc.map(l => {
+    const xy = CPXY[l.cp]; if(!xy) return null;
+    const v = valOf(l); if(!(v > 0)) return null;
+    return { l, v, m: metric(l), la: xy[0], lo: xy[1] };
+  }).filter(Boolean);
+}
+
+function drawLoc(pts){
+  const max = Math.max(...pts.map(p=>p.v), 1);
+  locLayer = L.layerGroup();
+  pts.forEach(p => {
+    const r = 2.2 + 13 * Math.sqrt(p.v / max);
+    L.circleMarker([p.la, p.lo], {
+      renderer: canvas, radius: r,
+      fillColor: colorFor(p.m), fillOpacity: .78, color:'#5b3b12', weight:.4, opacity:.5
+    }).bindTooltip(() => tipLoc(p.l), { className:'tt' }).addTo(locLayer);
+  });
+  locLayer.addTo(map);
+}
+
+function drawDens(pts){
+  const max = Math.max(...pts.map(p=>p.v), 1);
+  densLayer = L.heatLayer(pts.map(p => [p.la, p.lo, Math.sqrt(p.v / max)]), {
+    radius: 17, blur: 22, maxZoom: 11, minOpacity: .25,
+    gradient: { 0:'#ffffcc', .25:'#fed976', .5:'#fd8d3c', .72:'#e31a1c', 1:'#800026' }
+  }).addTo(map);
+}
+
+function tipLoc(l){
+  const p = DATA.byProv[l.c];
+  const rows = DATA.seg.map((s,i) => l.s[i]
+    ? `<tr><td style="${i===segIdx?'color:#e8eef5;font-weight:600':''}">${s}</td><td>${fmt(l.s[i])}</td></tr>` : '').join('');
+  return `<b>${l.l}</b>
+    <div style="color:#94a2b2;font-size:11px">${l.cp} · ${p ? p.n : ''}</div>
+    <div class="big">${fmt(valOf(l))}</div>
+    <div style="color:#94a2b2;font-size:11px">${segIdx<0?'total pólizas':DATA.seg[segIdx]+' · '+pct(shareOf(l))+' de la localidad'}</div>
+    <table>${rows}<tr><td style="border-top:1px solid #262f3a;padding-top:3px">Total</td>
+    <td style="border-top:1px solid #262f3a;padding-top:3px;color:#e8eef5">${fmt(l.t)}</td></tr></table>`;
+}
+
+/* ---------- leyenda ---------- */
+const legend = L.control({ position:'bottomright' });
+legend.onAdd = () => { const d = L.DomUtil.create('div','legend'); d.id='lg'; return d; };
+legend.addTo(map);
+function drawLegend(){
+  const el = document.getElementById('lg'); if(!el) return;
+  const lo = breaks.length ? breaks[0] : 0, hi = breaks.length ? breaks[breaks.length-1] : 0;
+  const f = mode === 'pct' ? pct : fmtK;
+  el.innerHTML = `<h3>${mode==='pct' ? '% cuota' : 'Pólizas'} · ${segIdx<0?'total':DATA.seg[segIdx]}</h3>
+    <div class="sc">${RAMP.map(c=>`<i style="background:${c}"></i>`).join('')}</div>
+    <div class="lb"><span>${f(lo)}</span><span>menos ◄ ► más</span><span>${f(hi)}+</span></div>`;
+}
+
+/* ---------- ranking / búsqueda ---------- */
+function drawRank(){
+  const q = document.getElementById('q').value.trim().toLowerCase();
+  const box = document.getElementById('rank');
+  const isLoc = view !== 'prov' || activeProv || q.length >= 2;
+  let items;
+  if(isLoc){
+    let src = activeProv && !q ? (DATA.locByProv[activeProv] || []) : DATA.loc;
+    if(q) src = src.filter(l => l.l.toLowerCase().includes(q) || l.cp.startsWith(q) || (DATA.byProv[l.c]||{}).n.toLowerCase().includes(q));
+    items = src.map(l => ({ o:l, v:valOf(l), m:metric(l), nm:l.l, sub:l.cp + ' · ' + (DATA.byProv[l.c]||{}).n, loc:true }));
+  }else{
+    items = DATA.prov.map(p => ({ o:p, v:valOf(p), m:metric(p), nm:p.n, sub:'', loc:false }));
+  }
+  items = items.filter(i => i.v > 0).sort((a,b) => b.m - a.m || b.v - a.v);
+  const shown = items.slice(0, 200);
+  const max = shown.length ? Math.max(...shown.map(i=>i.m)) : 1;
+  const tot = items.reduce((a,i) => a + i.v, 0);
+
+  document.getElementById('rankh').textContent =
+    (isLoc ? 'Localidades' : 'Provincias') +
+    (activeProv && !q ? ' · ' + DATA.byProv[activeProv].n : '') +
+    ` (${fmt(items.length)}${items.length > 200 ? ', top 200' : ''})`;
+
+  box.innerHTML = shown.map((i,k) => `
+    <div class="it" data-k="${k}">
+      <span style="color:#5d6b7c;width:22px;font-variant-numeric:tabular-nums">${k+1}</span>
+      <span class="nm">${esc(i.nm)}${i.sub ? `<em>${esc(i.sub)}</em>` : ''}
+        <span class="bar" style="display:block;width:${Math.max(2, i.m/max*100)}%"></span></span>
+      <span class="vl">${fmt(i.v)}</span>
+      <span class="pc">${tot ? pct(i.v/tot*100) : '—'}</span>
+    </div>`).join('') || '<div class="note" style="padding-top:10px">Sin resultados.</div>';
+
+  [...box.querySelectorAll('.it')].forEach(el => el.onclick = () => {
+    const i = shown[+el.dataset.k];
+    if(i.loc){
+      const xy = CPXY && CPXY !== 'err' ? CPXY[i.o.cp] : null;
+      if(xy) map.flyTo(xy, 12, { duration:.7 });
+      else selectProv(i.o.c);
+    } else selectProv(i.o.c);
+  });
+}
+const esc = s => String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+
+function selectProv(code){
+  activeProv = activeProv === code ? null : code;
+  const f = GEO.features.find(x => x.properties.cod_prov === code);
+  if(activeProv && f) map.fitBounds(L.geoJSON(f).getBounds(), { padding:[30,30] });
+  else map.flyTo([40.2,-3.6], 6, { duration:.6 });
+  provLayer.setStyle(styleProv);
+  drawRank();
+}
+
+/* ---------- render ---------- */
+function render(){
+  const pv = DATA.prov.map(metric);
+  const lv = view === 'prov' ? [] : locPoints().map(p => p.m);
+  breaks = quantiles(view === 'prov' ? pv : lv, RAMP.length);
+
+  if(locLayer){ map.removeLayer(locLayer); locLayer = null; }
+  if(densLayer){ map.removeLayer(densLayer); densLayer = null; }
+  provLayer.setStyle(styleProv);
+  if(view !== 'prov'){
+    const pts = locPoints();
+    if(pts.length){ view === 'loc' ? drawLoc(pts) : drawDens(pts); }
+  }
+
+  const tot = DATA.prov.reduce((a,p) => a + valOf(p), 0);
+  document.getElementById('k1').textContent = fmt(tot);
+  document.getElementById('k1l').textContent = segIdx < 0 ? 'Pólizas' : DATA.seg[segIdx];
+  document.getElementById('k2').textContent = DATA.prov.filter(p => valOf(p) > 0).length;
+  document.getElementById('k3').textContent = fmt(DATA.loc.filter(l => valOf(l) > 0).length);
+
+  drawLegend(); drawRank();
+}
+
+/* ---------- eventos ---------- */
+document.getElementById('views').onclick = e => {
+  const b = e.target.closest('button'); if(!b) return;
+  if(b.dataset.v !== 'prov' && (!CPXY || CPXY === 'err')){
+    alert(CPXY === 'err' ? 'No se han podido cargar las coordenadas de los códigos postales.' : 'Cargando coordenadas de códigos postales, espera unos segundos…');
+    return;
+  }
+  view = b.dataset.v;
+  [...e.currentTarget.children].forEach(x => x.classList.toggle('on', x === b));
+  render();
+};
+document.getElementById('modes').onclick = e => {
+  const b = e.target.closest('button'); if(!b) return;
+  mode = b.dataset.m;
+  [...e.currentTarget.children].forEach(x => x.classList.toggle('on', x === b));
+  render();
+};
+let t; document.getElementById('q').oninput = () => { clearTimeout(t); t = setTimeout(drawRank, 180); };
+
+boot().catch(e => {
+  const l = document.getElementById('load');
+  if(l) l.innerHTML = '<span style="color:#ff8a80">Error cargando los datos: ' + esc(e.message) + '</span>';
+});
+</script>
+</body>
+</html>
