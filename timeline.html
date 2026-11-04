@@ -17,6 +17,7 @@ header h1{font-size:17px;font-weight:700;letter-spacing:.3px}
 header .sub{font-size:11px;color:#C9D2E4}
 .controls{display:flex;align-items:center;gap:10px;margin-left:auto}
 button{cursor:pointer;border:none;border-radius:6px;font-family:inherit}
+#vista{font-family:inherit;font-size:13px;font-weight:700;padding:7px 10px;border-radius:6px;border:0;background:#fff;color:var(--az);cursor:pointer}
 #play{background:var(--oro);color:var(--az);font-weight:700;font-size:15px;padding:8px 22px}
 #play:hover{filter:brightness(1.06)}
 .spd{background:rgba(255,255,255,.14);color:#fff;font-size:12px;padding:6px 10px}
@@ -76,6 +77,7 @@ footer{background:var(--bg);border-top:1px solid var(--br);padding:5px 16px;font
 <header>
   <div class="brand"><h1>PLAN DE TRANSFORMACIÓN LOGÍSTICA</h1><div class="sub">De 80 a 500 M€ · Evolución de la red 2026-2030 · Confidencial — uso interno</div></div>
   <div class="controls">
+    <select id="vista" aria-label="Vista"><option value="timeline.html" selected>Plan nacional</option><option value="madrid.html">Desarrollo de Madrid</option></select>
     <div id="qlabel">2S 2026</div>
     <button id="play">▶ Reproducir</button>
     <button class="spd on" data-s="1">×1</button><button class="spd" data-s="2">×2</button><button class="spd" data-s="4">×4</button>
@@ -310,6 +312,7 @@ function hardReset(){ Object.values(H).forEach(h=>{map.removeLayer(h.m);map.remo
  actualMk.forEach(m=>m.setOpacity(1)); document.getElementById('clphoto').style.display='none'; lastSrc=''; clearTimeout(clpT); document.getElementById('feed').innerHTML=''; fired=-1; map.setView([40.42,-3.65],9.2); }
 function resetAll(){ playing=false; document.getElementById('endcard').style.display='none'; document.getElementById('play').textContent='▶ Reproducir'; hardReset(); t=0; update(); }
 document.getElementById('reset').onclick=resetAll;
+document.getElementById('vista').onchange=e=>{location.href=e.target.value;};
 update();
 </script>
 </body>
