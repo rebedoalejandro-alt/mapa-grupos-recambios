@@ -119,7 +119,7 @@ footer{background:var(--bg);border-top:1px solid var(--br);padding:5px 16px;font
 <img src="tiendas/t_madrid_17.jpg" data-cap="<b>Centro de reparto</b> · una delegación de la red: 500-1.500 m², 8.000-10.000 referencias, 1 hora — foto real" title="Centro de reparto">
 </div>
 <div id="clphoto"><img id="photoimg" src="cl_render.jpg" alt=""><div class="cap" id="photocap"></div></div>
-<div id="endcard"><div><h2>UNA RED <span class="o">PARA 500 M€</span></h2><p>1 Centro Logístico · 13 hubs · 127 centros de reparto<br>Programa completo ≈ 357-410 M€: adquisiciones ≈259 + plataforma logística 98-151<br>Los 127 centros de reparto se incorporan montados, sin inversión</p><button onclick="resetAll()">Volver a ver</button></div></div>
+<div id="endcard"><div><h2>UNA RED <span class="o">PARA 500 M€</span></h2><p>1 Centro Logístico · 13 hubs · 127 centros de reparto<br>Programa completo ≈ 349-401 M€: adquisiciones ≈259 + plataforma logística 90-142<br>Los 127 centros de reparto se incorporan montados, sin inversión</p><button onclick="resetAll()">Volver a ver</button></div></div>
 
 <script>
 /* ================== MAPA ================== */
@@ -188,11 +188,11 @@ const QS=['3T 2026','4T 2026','1T 2027','2T 2027','3T 2027','4T 2027','1T 2028',
 /* interpolables por trimestre: [fact, nodos, invAcum, adq, crAcum] */
 const K=[
 /* fact nodos inv adq cr | M&A propco autom */
-[130,18,0.2,0,0, 0,0.2,0],[130,18,0.5,0,0, 0,0.4,0.1],[130,18,5.1,0,0, 23.4,4.9,0.2],[163,18,13.4,1,0, 84,12.9,0.5],
-[250,18,22.6,2,4, 115,21.1,1.5],[294,19,32.9,3,15, 115,29.3,3.6],[294,19,47.2,3,22, 115,41.2,6.1],[335,20,61.6,4,28, 159.6,53.5,8.1],
-[358,21,75,6,34, 187.1,64.8,10.1],[398,22,89.3,7,52, 187.1,74.1,15.2],[398,24,97.5,7,64, 187.1,80.2,17.2],[425,25,105.7,8,75, 222,85.4,20.3],
-[425,28,113.8,8,86, 222,89,24.9],[448,29,122,9,95, 259.4,91.6,30.4],[500,31,124.3,10,105, 259.4,93,31.4],[500,32,124.3,10,114, 259.4,93,31.4],
-[500,34,124.3,10,127, 259.4,93,31.4],[500,141,124.3,10,127, 259.4,93,31.4]];
+[130,18,0.2,0,0, 0,0.2,0],[130,18,0.4,0,0, 0,0.4,0.1],[130,18,4.7,0,0, 23.4,4.5,0.2],[163,18,12.2,1,0, 84,11.6,0.5],
+[250,18,20.6,2,4, 115,19.1,1.5],[294,19,30.1,3,15, 115,26.6,3.6],[294,19,43.4,3,22, 115,37.3,6.1],[335,20,56.6,4,28, 159.6,48.5,8.1],
+[358,21,68.9,6,34, 187.1,58.7,10.1],[398,22,82.3,7,52, 187.1,67.1,15.2],[398,24,89.9,7,64, 187.1,72.7,17.2],[425,25,97.6,8,75, 222,77.4,20.3],
+[425,28,105.5,8,86, 222,80.6,24.9],[448,29,113.4,9,95, 259.4,82.9,30.4],[500,31,115.6,10,105, 259.4,84.2,31.4],[500,32,115.6,10,114, 259.4,84.2,31.4],
+[500,34,115.6,10,127, 259.4,84.2,31.4],[500,141,115.6,10,127, 259.4,84.2,31.4]];
 /* eventos al ENTRAR en cada trimestre */
 const EV={
 0:[{t:'Arranca el programa: RFP de automatización a cinco proveedores, mandato de búsqueda de la parcela del CL y de las primeras naves de hub.',c:''},
@@ -233,7 +233,7 @@ const EV={
 15:[{t:'HUB REGIONAL 7 OPERATIVO.',c:'op'},{f:()=>{setHub('Hub regional 7 · Galicia',42.88,-8.54,'op',true);}}],
 16:[{t:'HUB REGIONAL 8 OPERATIVO — RED COMPLETA: 1 CL + 13 hubs + 127 centros de reparto = 141 nodos.',c:'op'},
    {f:()=>{setHub('Hub regional 8 · Duero',41.65,-4.72,'op',true);}}],
-17:[{t:'500 M€ sobre una red diseñada para ello. Programa completo ≈357-410 M€: adquisiciones ≈259 + plataforma logística 98-151. Los 127 CR se incorporan montados, sin inversión.',c:'final'},
+17:[{t:'500 M€ sobre una red diseñada para ello. Programa completo ≈349-401 M€: adquisiciones ≈259 + plataforma logística 90-142. Los 127 CR se incorporan montados, sin inversión.',c:'final'},
    {f:()=>{map.flyTo([40.2,-4.2],6.0,{duration:2});}}]
 };
 
