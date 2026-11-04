@@ -5,9 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Desarrollo de Madrid · Plan de Transformación Logística</title>
 <meta name="robots" content="noindex,nofollow">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow+Semi+Condensed:wght@400;500;600;700&display=swap">
 <style>
 /* Concepto: hoja de ruta de un jefe de tráfico — banda azul de cabecera con la línea de trimestres,
    el mapa de Madrid como plano de carreteras y una columna de contadores e hitos a la derecha. */
@@ -18,8 +15,8 @@
   --land:#eceae4; --mad:#f8f7f3; --h700:#efeee4; --h1000:#e6e7d6; --h1500:#dadcc6; --urb:#e4dfd3;
   --water:#c6def0; --river:#8fbbdd; --rail:#b3b0a6; --road1:#f3d389; --road2:#ffffff; --casing:#d9d3c4;
   --shield:#16336f; --shield-ink:#ffffff; --halo:rgba(255,255,255,.85);
-  --f-ui:"Barlow Semi Condensed","Arial Narrow",Arial,sans-serif;
-  --f-num:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --f-ui:Calibri,'Segoe UI',system-ui,sans-serif;
+  --f-num:Calibri,'Segoe UI',system-ui,sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#0f141d; --panel:#161d29; --ink:#e8ebf1; --muted:#9aa3b5; --line:#283244; --soft:#1c2535;
@@ -44,9 +41,9 @@ header{background:var(--band);color:var(--band-ink)}
 header .wrap{padding-block:14px 12px;display:grid;grid-template-columns:1fr auto;gap:10px 20px;align-items:center}
 .brand{border-left:4px solid var(--gold);padding-left:12px;min-width:0}
 .eyebrow{font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--band-muted);font-weight:600}
-h1{margin:2px 0 0;font-family:var(--f-num);font-weight:700;font-size:26px;letter-spacing:.01em;line-height:1.1;text-wrap:balance}
+h1{margin:2px 0 0;font-family:var(--f-num);font-weight:700;font-size:23px;letter-spacing:.01em;line-height:1.1;text-wrap:balance}
 .controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
-#qlabel{font-family:var(--f-num);font-size:30px;font-weight:700;color:var(--gold);min-width:110px;text-align:right;font-variant-numeric:tabular-nums}
+#qlabel{font-family:var(--f-num);font-size:26px;font-weight:700;color:var(--gold);min-width:110px;text-align:right;font-variant-numeric:tabular-nums}
 button{font-family:inherit;cursor:pointer;border:0;border-radius:6px}
 button:focus-visible,.pt:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 #vista{font-family:inherit;font-size:14px;font-weight:600;padding:7px 10px;border-radius:6px;border:0;background:#fff;color:#16336f;cursor:pointer}
@@ -72,7 +69,7 @@ svg#map{display:block;width:100%;height:auto;aspect-ratio:1000/725.6;max-width:1
 aside{display:flex;flex-direction:column;gap:12px;min-width:0}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
 .kgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.k b{display:block;font-family:var(--f-num);font-size:30px;line-height:1;font-weight:700;color:var(--hub);font-variant-numeric:tabular-nums}
+.k b{display:block;font-family:var(--f-num);font-size:27px;line-height:1;font-weight:700;color:var(--hub);font-variant-numeric:tabular-nums}
 .k small{display:block;margin-top:3px;font-size:12px;color:var(--muted);line-height:1.25}
 .k.wide{grid-column:1/-1;display:flex;align-items:baseline;gap:10px;border-top:1px solid var(--line);padding-top:10px}
 .k.wide b{font-size:26px;white-space:nowrap}
@@ -109,7 +106,7 @@ footer .wrap{padding-block:4px 22px;font-size:12px;color:var(--muted)}
 #tip b{display:block;font-size:13.5px}
 #tip .r{font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-weight:700}
 #end{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(22,51,111,.88);color:#fff;text-align:center;padding:16px}
-#end h3{margin:0;font-family:var(--f-num);font-size:40px;line-height:1.05}
+#end h3{margin:0;font-family:var(--f-num);font-size:36px;line-height:1.05}
 #end h3 span{color:#f5b400}
 #end p{margin:10px 0 0;font-size:16px;color:#d6deee}
 #end button{margin-top:18px;background:#f5b400;color:#16336f;font-weight:700;font-size:15px;padding:9px 22px}
